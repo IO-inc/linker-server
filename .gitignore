@@ -1,0 +1,12 @@
+logs
+target
+sbt-dist
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+/RUNNING_PID
+LICENSE
+sbt.bat
+

@@ -1,14 +1,12 @@
 package models
 
-import java.time.LocalDateTime
-
+import java.sql.{Date, Time, Timestamp}
+import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset}
 import javax.inject.Inject
 
 import play.api.db.slick.DatabaseConfigProvider
-
 import slick.jdbc.JdbcProfile
-
-
+import slick.jdbc.MySQLProfile.api._
 
 /**
   * Created by mijeongpark on 2017. 7. 5..
@@ -21,11 +19,12 @@ case class Customer(
                      postNo: String,
                      addr1: String,
                      addr2: String,
-                     createdAt: LocalDateTime = LocalDateTime.now(),
-                     updatedAt: LocalDateTime = LocalDateTime.now(),
-                     deletedAt: LocalDateTime )
+                     createdAt: Timestamp,
+                     updatedAt: Timestamp,
+                     deletedAt: Timestamp )
 
 class CustomerRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
+
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   val db = dbConfig.db
   import dbConfig.profile.api._
@@ -44,13 +43,17 @@ class CustomerRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
 
     def addr2 = column[String]("addr2")
 
-    def createdAt = column[LocalDateTime]("createdAt")
+    def createdAt = column[Timestamp]("createdAt")
 
-    def updatedAt = column[LocalDateTime]("updatedAt")
+    def updatedAt = column[Timestamp]("updatedAt")
 
-    def deletedAt = column[LocalDateTime]("deletedAt")
+    def deletedAt = column[Timestamp]("deletedAt")
 
     def * = (id, name, authNumber, postNo, addr1, addr2, createdAt, updatedAt, deletedAt) <> (Customer.tupled. Customer.unapply)
   }
+
+  def find(id: Long) =
+    db.run(Customers.filter(_.id === id).result.headOption)
+
 }
 

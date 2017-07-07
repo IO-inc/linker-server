@@ -28,6 +28,12 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   import dbConfig.profile.api._
   private[models] val AccessTokens = TableQuery[AccessTokensTable]
 
+  private def __findByAccessToken(accessToken: String): DBIO[Option[AccessToken]] =
+    AccessTokens.filter(_.accessToken === accessToken).result.headOption
+
+  def findByAccessToken(accessToken: String): Future[Option[AccessToken]] =
+    db.run(__findByAccessToken(accessToken))
+
   private[models] class AccessTokensTable(tag: Tag) extends Table[AccessToken](tag, "AccessTokens") {
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)

@@ -1,23 +1,22 @@
 package controllers
 
-import models.{Customer, CustomerRepo}
-
 import javax.inject._
 
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.mvc._
-import play.api.libs.json._
+import models.{CustomerRepo, Customer}
 
-import scala.concurrent.Future
+import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsValue, Writes, Json}
+import play.api.mvc._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by mijeongpark on 2017. 7. 5..
   */
-@Singleton
-class UserController @Inject() (dbConfigProvider: DatabaseConfigProvider,
-                                cc: ControllerComponents) extends AbstractController(cc) {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+case class RequestInfo(url: String, method: String, headers: Map[String, String], body: String)
+
+class UserController @Inject()(dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   val customerRepo = new CustomerRepo(dbConfigProvider)
 
@@ -37,6 +36,12 @@ class UserController @Inject() (dbConfigProvider: DatabaseConfigProvider,
     future.map { model =>
       Ok(Json.toJson(model))
     }
+  }
+
+  def createDeviceToken = Action.async { implicit request: Request[AnyContent] =>
+
+    println("request body: " + request.body)
+    Future.successful(Ok("fail"))
   }
 
 }

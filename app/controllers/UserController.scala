@@ -1,8 +1,9 @@
 package controllers
 
+import models.{Customer, CustomerRepo}
+
 import javax.inject._
 
-import models.{Customer, CustomerRepo}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc._
 import play.api.libs.json._
@@ -20,17 +21,19 @@ class UserController @Inject() (dbConfigProvider: DatabaseConfigProvider,
 
   val customerRepo = new CustomerRepo(dbConfigProvider)
 
+  // TODO: saperate implicit writers
   implicit val implicitCommandDataWrites = new Writes[Customer] {
     def writes(model: Customer): JsValue = {
       Json.obj(
         "id" -> model.id,
-        "name" -> model.name
+        "name" -> model.name,
+        "postNo" -> model.postNo
       )
     }
   }
 
   def getCustomer(id: Long) = Action.async {
-    val future: Future[Option[Customer]] = customerRepo.find(id)
+    val future: Future[Option[Customer]] = customerRepo.findById(id)
     future.map { model =>
       Ok(Json.toJson(model))
     }

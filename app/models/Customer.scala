@@ -13,7 +13,7 @@ import scala.concurrent.Future
   * Created by mijeongpark on 2017. 7. 5..
   */
 
-case class Customer(
+case class Customer (
                      id: Long,
                      name: Option[String],
                      authNumber: Option[String],
@@ -38,22 +38,15 @@ class CustomerRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     db.run(_findById(id))
 
   private[models] class CustomersTable(tag: Tag) extends Table[Customer](tag, "Customers") {
+
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-
     def name = column[Option[String]]("name")
-
     def authNumber = column[Option[String]]("authNumber")
-
     def postNo = column[Option[String]]("postNo")
-
     def addr1 = column[Option[String]]("addr1")
-
     def addr2 = column[Option[String]]("addr2")
-
     def createdAt = column[Timestamp]("createdAt")
-
     def updatedAt = column[Timestamp]("updatedAt")
-
     def deletedAt = column[Option[Timestamp]]("deletedAt")
 
     def * = (id, name, authNumber, postNo, addr1, addr2, createdAt, updatedAt, deletedAt) <> (Customer.tupled, Customer.unapply)

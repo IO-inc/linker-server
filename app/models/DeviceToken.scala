@@ -7,8 +7,6 @@ import play.api.db.slick.DatabaseConfigProvider
 
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.Future
-
 /**
   * Created by Rachel on 2017. 7. 7..
   */
@@ -28,6 +26,9 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   import dbConfig.profile.api._
   private[models] val DeviceTokens = TableQuery[DeviceTokensTable]
 
+  def insert(deviceToken: DeviceToken): DBIO[Long] =
+    DeviceTokens returning DeviceTokens.map(_.id) += deviceToken
+
   private[models] class DeviceTokensTable(tag: Tag) extends Table[DeviceToken](tag, "DeviceTokens") {
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
@@ -38,6 +39,5 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
     def deletedAt = column[Option[Timestamp]]("deletedAt")
 
     def * = (id, customerDeviceId, deviceToken, createdAt, updatedAt, deletedAt) <> (DeviceToken.tupled, DeviceToken.unapply)
-
   }
 }

@@ -1,0 +1,23 @@
+language: scala
+
+scala:
+  - 2.12.2
+
+branches:
+  only:
+    - dev
+    - feature/a4C8mNdD
+
+jdk:
+  - oraclejdk8
+
+script:
+  sbt ++$TRAVIS_SCALA_VERSION test
+
+env:
+  global:
+    - DB_URL=jdbc:mysql://io-linker-dev.ccxpdsv7tuxs.ap-northeast-2.rds.amazonaws.com/linker
+    - DB_PASSWORD=!bobbers7
+
+notifications:
+  slack: switcher:Tkionvkg730XII2r6rIMDLPK

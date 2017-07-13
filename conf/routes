@@ -13,4 +13,5 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 POST    /v1/user/token              controllers.UserController.createDeviceToken
+GET     /v1/user/detail             controllers.UserController.getUserDetail
 

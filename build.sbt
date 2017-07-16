@@ -13,5 +13,7 @@ libraryDependencies += "com.h2database" % "h2" % "1.4.194"
 libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.41"
 libraryDependencies += "com.typesafe.play" %% "play-slick" % "3.0.0"
 libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0"
+libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "0.9.6"
+libraryDependencies ++= Seq(ws)
 
 

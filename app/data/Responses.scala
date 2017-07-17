@@ -11,9 +11,9 @@ case class ErrorResponse(status: String = "error", message: String)
 case class CreateDeviceTokenResponse(id: Long)
 case class GetUserDetailResponse(
                                 customer: Customer,
-                                linkerList: Option[List[String]],
-                                switcherList: Option[List[String]],
-                                requestList: Option[List[String]]
+                                linkerList: Seq[String],
+                                switcherList: List[String],
+                                requestList: List[String]
                                 )
 
 object SuccessResponse {

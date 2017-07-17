@@ -49,8 +49,8 @@ class UserController @Inject()(cc: ControllerComponents,
     val accessToken = authorization.get.split(" ")(1)
 
     deviceTokenRepo.createDeviceToken(token, accessToken) match {
-      case Right(id) => Future.successful(Ok(Json.toJson(SuccessResponse("success", Option(Json.toJson(CreateDeviceTokenResponse(id)))))))
-      case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse("error", message))))
+      case Right(id) => Future.successful(Ok(Json.toJson(SuccessResponse(data = Option(Json.toJson(CreateDeviceTokenResponse(id)))))))
+      case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
     }
   }
 
@@ -66,9 +66,9 @@ class UserController @Inject()(cc: ControllerComponents,
         val switcherList = switcherService.getSwitcherDetail("Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=")
         val userDetail = GetUserDetailResponse(customer, Option(linkerList.get.map(m => m.macAddress.get)), switcherList, None)
 
-        Future.successful(Ok(Json.toJson(SuccessResponse("success", Option(Json.toJson(userDetail))))))
+        Future.successful(Ok(Json.toJson(SuccessResponse(data = Option(Json.toJson(userDetail))))))
       }
-      case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse("error", message))))
+      case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
     }
   }
 

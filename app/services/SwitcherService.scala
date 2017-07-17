@@ -19,17 +19,20 @@ class SwitcherService @Inject()(ws: WSClient) {
 
   private val HOST = "https://io-switcher-dev.switcher.kr"
 
-  def getSwitcherDetail(accessToken: String): Option[List[String]] = {
+  def getSwitcherDetail(accessToken: String): (List[String], List[String]) = {
 
     val path = "/v3/mobile/user/me"
 
     val request = async {
       // TODO: separate API call
       val response = await(ws.url(HOST + path).withHttpHeaders(("Authorization","Bearer " + accessToken)).execute("GET"))
-      (((response.json \ "data").as[JsValue]) \ "macaddressList").as[List[String]]
+      val switcherList = (((response.json \ "data").as[JsValue]) \ "macaddressList").as[List[String]]
+      val requestList = (((response.json \ "data").as[JsValue]) \ "requestList").as[List[String]]
+
+      (switcherList, requestList)
     }
 
-    Option(Await.result(request, Duration(3000, "millis")))
+    Await.result(request, Duration(3000, "millis"))
   }
 
 }

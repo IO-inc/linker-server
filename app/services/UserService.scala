@@ -14,6 +14,8 @@ class UserService @Inject()(
                              accessTokenRepo: AccessTokenRepo,
                              customerRepo: CustomerRepo) {
 
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   def checkAccessToken(accessToken: String): Either[String, AccessToken] = {
     accessTokenRepo.findByAccessToken(accessToken) match {
       case Some(accessToken) => Right(accessToken)
@@ -21,12 +23,12 @@ class UserService @Inject()(
     }
   }
 
-  def getUserDetail(accessToken: AccessToken): (Customer, Option[List[Linker]]) = {
+  def getUserDetail(accessToken: AccessToken): (Customer, Seq[Linker]) = {
 
    val userDetailFuture = async {
       val Some(customerDevice) = await(customerRepo.findCustomerDeviceId(accessToken.customerDeviceId.getOrElse(0)))
       val Some(customer) = await(customerRepo.findById(customerDevice.customerId.getOrElse(0)))
-      val linkerList = await(customerRepo.findLinkerListByCustomerId(customerDevice.customerId.get))
+      val linkerList = customerRepo.findLinkerListByCustomerId(customerDevice.customerId.get)
 
       (customer, linkerList)
     }

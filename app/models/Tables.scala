@@ -8,11 +8,13 @@ import java.sql.Timestamp
 
 case class Customer(
                      id: Long,
+                     phoneNumber: Option[String],
                      name: Option[String],
                      authNumber: Option[String],
                      postNo: Option[String],
                      addr1: Option[String],
                      addr2: Option[String],
+                     email: Option[String],
                      createdAt: Timestamp,
                      updatedAt: Timestamp,
                      deletedAt: Option[Timestamp])

@@ -49,7 +49,6 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
           case n: Long => Right(n)
           case None => Left("There is no access token")
         }
-
       }, Duration(3000, "millis"))
   }
 

@@ -63,8 +63,8 @@ class UserController @Inject()(cc: ControllerComponents,
       case Right(accessToken) => {
         val (customer, linkerList) = userService.getUserDetail(accessToken)
         // TODO: replace "Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=" to access token parameter after modifying Switcher Server
-        val switcherList = switcherService.getSwitcherDetail("Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=")
-        val userDetail = GetUserDetailResponse(customer, Option(linkerList.get.map(m => m.macAddress.get)), switcherList, None)
+        val switcherDetail = switcherService.getSwitcherDetail("Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=")
+        val userDetail = GetUserDetailResponse(customer, linkerList.map(m => m.macAddress.get), switcherDetail._1, switcherDetail._2)
 
         Future.successful(Ok(Json.toJson(SuccessResponse(data = Option(Json.toJson(userDetail))))))
       }

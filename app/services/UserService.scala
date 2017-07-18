@@ -1,6 +1,7 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
+import data.ErrorMessage
 import models._
 import scala.async.Async._
 import scala.concurrent.Await
@@ -19,7 +20,7 @@ class UserService @Inject()(
   def checkAccessToken(accessToken: String): Either[String, AccessToken] = {
     accessTokenRepo.findByAccessToken(accessToken) match {
       case Some(accessToken) => Right(accessToken)
-      case None => Left("There is no access token")
+      case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
     }
   }
 

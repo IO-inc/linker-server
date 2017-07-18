@@ -1,6 +1,7 @@
 package models
 
 import Tables._
+import data.ErrorMessage
 
 import java.sql.Timestamp
 import javax.inject.Inject
@@ -48,7 +49,7 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
       db.run(actions.transactionally).map { deviceTokenResult =>
         deviceTokenResult match {
           case n: Long => Right(n)
-          case None => Left("There is no access token")
+          case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
         }
       }, Duration(3000, "millis"))
   }

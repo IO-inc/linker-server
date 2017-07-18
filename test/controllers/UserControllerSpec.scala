@@ -11,7 +11,7 @@ import services.{UserService, SwitcherService}
 /**
   * Created by Rachel on 2017. 7. 12..
   */
-class UserControllerSpec extends PlaySpecification with Mockito {
+class CreateDeviceTokenSpec extends PlaySpecification with Mockito {
 
 
   private val controllerComponents = stubControllerComponents()

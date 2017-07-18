@@ -1,5 +1,7 @@
-
 package models
+
+import Tables._
+import data.ErrorMessage
 
 import java.sql.Timestamp
 import javax.inject.Inject
@@ -47,36 +49,9 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
       db.run(actions.transactionally).map { deviceTokenResult =>
         deviceTokenResult match {
           case n: Long => Right(n)
-          case None => Left("There is no access token")
+          case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
         }
-
       }, Duration(3000, "millis"))
-  }
-
-  // TODO: separate table definitions
-  class DeviceTokensTable(tag: Tag) extends Table[DeviceToken](tag, "DeviceTokens") {
-
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def customerDeviceId = column[Option[Long]]("customerDeviceId")
-    def deviceToken = column[Option[String]]("deviceToken")
-    def createdAt = column[Timestamp]("createdAt")
-    def updatedAt = column[Timestamp]("updatedAt")
-    def deletedAt = column[Option[Timestamp]]("deletedAt")
-
-    def * = (id, customerDeviceId, deviceToken, createdAt, updatedAt, deletedAt) <> (DeviceToken.tupled, DeviceToken.unapply)
-  }
-
-  private[models] class AccessTokensTable(tag: Tag) extends Table[AccessToken](tag, "AccessTokens") {
-
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def customerDeviceId = column[Option[Long]]("customerDeviceId")
-    def accessToken = column[Option[String]]("accessToken")
-    def createdAt = column[Timestamp]("createdAt")
-    def updatedAt = column[Timestamp]("updatedAt")
-    def deletedAt = column[Option[Timestamp]]("deletedAt")
-
-    def * = (id, customerDeviceId, accessToken, createdAt, updatedAt, deletedAt) <> (AccessToken.tupled, AccessToken.unapply)
-
   }
 }
 

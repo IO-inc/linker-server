@@ -1,6 +1,7 @@
 package models
 
-import java.sql.Timestamp
+import Tables._
+
 import javax.inject.Inject
 
 import play.api.db.slick.DatabaseConfigProvider
@@ -34,19 +35,4 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
         }
       }, Duration(3000, "millis"))
   }
-
-
-  private[models] class AccessTokensTable(tag: Tag) extends Table[AccessToken](tag, "AccessTokens") {
-
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def customerDeviceId = column[Option[Long]]("customerDeviceId")
-    def accessToken = column[Option[String]]("accessToken")
-    def createdAt = column[Timestamp]("createdAt")
-    def updatedAt = column[Timestamp]("updatedAt")
-    def deletedAt = column[Option[Timestamp]]("deletedAt")
-
-    def * = (id, customerDeviceId, accessToken, createdAt, updatedAt, deletedAt) <> (AccessToken.tupled, AccessToken.unapply)
-
-  }
-
 }

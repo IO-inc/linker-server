@@ -17,7 +17,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()(cc: ControllerComponents,
                                deviceTokenRepo: DeviceTokenRepo,
-                               accessTokenRepo: AccessTokenRepo,
                                switcherService: SwitcherService,
                                userService: UserService)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 

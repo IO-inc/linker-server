@@ -6,5 +6,6 @@ package data
 object ErrorMessage {
 
   val NO_ACCESS_TOKEN = "There is no access token"
+  val NO_REQUEST_PARAMETER = " is empty in request parameters"
 
 }

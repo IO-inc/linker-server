@@ -12,7 +12,7 @@ import services.{UserService, SwitcherService}
 /**
   * Created by Rachel on 2017. 7. 13..
   */
-class GetUserDetailSpec extends PlaySpecification with Mockito{
+class GetUserDetailSpec extends PlaySpecification with Mockito {
 
   private val controllerComponents = stubControllerComponents()
   private implicit val ec = controllerComponents.executionContext

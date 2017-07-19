@@ -4,4 +4,5 @@
 
 POST    /v1/user/token              controllers.UserController.createDeviceToken
 GET     /v1/user/detail             controllers.UserController.getUserDetail
+POST    /v1/user/auth               controllers.UserController.getAuthSMS
 

@@ -2,11 +2,15 @@ package common
 
 import com.google.inject.Singleton
 
+import scala.concurrent.duration.Duration
+
 /**
   * Created by Rachel on 2017. 7. 19..
   */
 @Singleton
 object Common {
+
+  val COMMON_ASYNC_DURATION = Duration(3000, "millis")
 
   def createAuthSMSNumber: String = {
     val now = System.currentTimeMillis().toString

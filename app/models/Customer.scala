@@ -5,10 +5,10 @@ import java.sql.Timestamp
 import Tables._
 import javax.inject.Inject
 
+import common.Common
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 /**
@@ -62,16 +62,16 @@ class CustomerRepo @Inject()(
         .join(Linkers).on(_._2.linkerId === _.id)
     } yield (linkers)
 
-    Await.result(db.run(query.result), Duration(3000, "millis"))
+    Await.result(db.run(query.result), Common.COMMON_ASYNC_DURATION)
   }
 
   def createCustomer(customer: Customer) = {
-    Await.result(db.run(_insert(customer)), Duration(3000, "millis"))
+    Await.result(db.run(_insert(customer)), Common.COMMON_ASYNC_DURATION)
   }
 
   def updateCustomer(customer: Customer) = {
     customer.updatedAt = new Timestamp(System.currentTimeMillis())
-    Await.result(db.run(_update(customer.id, customer)), Duration(3000, "millis"))
+    Await.result(db.run(_update(customer.id, customer)), Common.COMMON_ASYNC_DURATION)
   }
 }
 

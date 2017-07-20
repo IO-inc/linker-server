@@ -2,15 +2,14 @@ package models
 
 import Tables._
 import data.ErrorMessage
-
 import java.sql.Timestamp
 import javax.inject.Inject
 
+import common.Common
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 /**
   * Created by Rachel on 2017. 7. 7..
@@ -51,7 +50,7 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
           case n: Long => Right(n)
           case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
         }
-      }, Duration(3000, "millis"))
+      }, Common.COMMON_ASYNC_DURATION)
   }
 }
 

@@ -4,12 +4,11 @@ import java.sql.Timestamp
 
 import com.google.inject.{Inject, Singleton}
 import common.{Common, ThirdParty}
-import data.{ErrorMessage}
+import data.ErrorMessage
 import models._
 
 import scala.async.Async._
 import scala.concurrent.{Await}
-import scala.concurrent.duration.Duration
 
 /**
   * Created by Rachel on 2017. 7. 17..
@@ -39,7 +38,7 @@ class UserService @Inject()(
       (customer, linkerList)
     }
 
-    Await.result(userDetailFuture, Duration(3000, "millis"))
+    Await.result(userDetailFuture, Common.COMMON_ASYNC_DURATION)
   }
 
   def sendAuthSMS(phoneNumber: String): Either[String, String] = {
@@ -71,7 +70,7 @@ class UserService @Inject()(
   }
 
   def checkExistingUser(phoneNumber: String): Option[Customer] = {
-    Await.result(customerRepo.findByPhoneNumber(phoneNumber), Duration(3000, "millis"))
+    Await.result(customerRepo.findByPhoneNumber(phoneNumber), Common.COMMON_ASYNC_DURATION)
   }
 
 }

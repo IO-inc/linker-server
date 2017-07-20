@@ -37,4 +37,8 @@ class UserService @Inject()(
     Await.result(userDetailFuture, Duration(3000, "millis"))
   }
 
+  def checkExistingUser(phoneNumber: String): Option[Customer] = {
+    Await.result(customerRepo.findByPhoneNumber(phoneNumber), Duration(3000, "millis"))
+  }
+
 }

@@ -47,7 +47,7 @@ class UserService @Inject()(
     val now = new Timestamp(System.currentTimeMillis())
 
     thirdParty.sendSMS(List(phoneNumber), authNumber) match {
-      case "success" => {
+      case Common.SUCCESS => {
         checkExistingUser(phoneNumber) match {
           case Some(customer) => {
             customer.authNumber = Option(authNumber)
@@ -63,7 +63,7 @@ class UserService @Inject()(
             customerRepo.createCustomer(customer)
           }
         }
-        Right("success")
+        Right(Common.SUCCESS)
       }
       case _ => Left(ErrorMessage.FAIL_SMS_SEND)
     }

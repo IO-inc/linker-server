@@ -1,5 +1,6 @@
 package controllers
 
+import common.Common
 import data.{ErrorMessage}
 import models.DeviceTokenRepo
 import org.specs2.mock.Mockito
@@ -71,7 +72,7 @@ class GetAuthSMSSpec extends PlaySpecification with Mockito {
 
   "return response if sending sms is successful" in new WithApplication() {
 
-    mockUserService.sendAuthSMS(anyString) returns Right("success")
+    mockUserService.sendAuthSMS(anyString) returns Right(Common.SUCCESS)
 
     // given
     val fakeJson = Json.obj(
@@ -84,7 +85,7 @@ class GetAuthSMSSpec extends PlaySpecification with Mockito {
     val result = controller.getAuthSMS(request)
 
     // then
-    val expectedResult = s"""{"status":"success","data":null}"""
+    val expectedResult = s"""{"status":"${Common.SUCCESS}","data":null}"""
 
     status(result) must beEqualTo(OK)
     contentAsString(result) mustEqual(expectedResult)

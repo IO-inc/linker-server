@@ -11,6 +11,7 @@ import scala.concurrent.duration.Duration
 object Common {
 
   val COMMON_ASYNC_DURATION = Duration(3000, "millis")
+  val SUCCESS = "success"
 
   def createAuthSMSNumber: String = {
     val now = System.currentTimeMillis().toString

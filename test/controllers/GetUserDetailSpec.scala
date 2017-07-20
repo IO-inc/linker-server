@@ -3,6 +3,7 @@ package controllers
 import java.sql.Timestamp
 
 import models.{Linker, Customer, AccessToken, DeviceTokenRepo}
+import common.Common
 
 import org.specs2.mock.Mockito
 import play.api.test.Helpers._
@@ -100,7 +101,7 @@ class GetUserDetailSpec extends PlaySpecification with Mockito {
       val result = controller.getUserDetail(request)
 
       // then
-      var expectedResult = """{"status":"success","data""""
+      var expectedResult = s"""{"status":"${Common.SUCCESS}","data""""
 
       status(result) must beEqualTo(OK)
       contentAsString(result) must contain(expectedResult)

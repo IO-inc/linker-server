@@ -2,7 +2,7 @@ package services
 
 import java.sql.Timestamp
 
-import common.ThirdParty
+import common.{ThirdParty, Common}
 import data.ErrorMessage
 import models.{AccessTokenRepo, Customer, CustomerRepo}
 import org.specs2.mock.Mockito
@@ -98,7 +98,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
     "return Right if sending sms is successful in case of new customer" in new WithApplication() {
 
-      mockThirdParty.sendSMS(any, anyString) returns "success"
+      mockThirdParty.sendSMS(any, anyString) returns Common.SUCCESS
       mockUserService.checkExistingUser(anyString) returns None
       mockCustomerRepo.createCustomer(any) returns 1
 
@@ -109,7 +109,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
       val result = service.sendAuthSMS(phoneNumber)
 
       // then
-      val expectedResult = Right("success")
+      val expectedResult = Right(Common.SUCCESS)
 
       result mustEqual(expectedResult)
     }
@@ -123,7 +123,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
       updatedAt = TIMESTAMP
     )
 
-    mockThirdParty.sendSMS(any, anyString) returns "success"
+    mockThirdParty.sendSMS(any, anyString) returns Common.SUCCESS
     mockUserService.checkExistingUser(anyString) returns Some(customer)
     mockCustomerRepo.updateCustomer(any) returns 1
 
@@ -134,7 +134,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
     val result = service.sendAuthSMS(phoneNumber)
 
     // then
-    val expectedResult = Right("success")
+    val expectedResult = Right(Common.SUCCESS)
 
     result mustEqual(expectedResult)
   }

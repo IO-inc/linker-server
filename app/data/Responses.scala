@@ -1,12 +1,13 @@
 package data
 
+import common.Common
 import models.Customer
 import play.api.libs.json.{JsValue, Json, Writes}
 
 /**
   * Created by mijeongpark on 2017. 7. 10..
   */
-case class SuccessResponse(status: String = "success", data: Option[JsValue] = None)
+case class SuccessResponse(status: String = Common.SUCCESS, data: Option[JsValue] = None)
 case class ErrorResponse(status: String = "error", message: String)
 case class CreateDeviceTokenResponse(id: Long)
 case class GetUserDetailResponse(

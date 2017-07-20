@@ -1,6 +1,7 @@
 package controllers
 
 import models.{DeviceTokenRepo}
+import common.Common
 
 import org.specs2.mock.Mockito
 import play.api.libs.json.Json
@@ -63,7 +64,7 @@ class CreateDeviceTokenSpec extends PlaySpecification with Mockito {
       val result = controller.createDeviceToken(request)
 
       // then
-      var expectedResult = s"""{"status":"success","data":{"id":${ID}}}"""
+      var expectedResult = s"""{"status":"${Common.SUCCESS}","data":{"id":${ID}}}"""
 
       status(result) must beEqualTo(OK)
       contentAsString(result) mustEqual(expectedResult)

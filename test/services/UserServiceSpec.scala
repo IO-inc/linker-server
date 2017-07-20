@@ -27,6 +27,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
   private val PHONE_NUMBER = "01028688487"
   private val CUSTOMER_ID = 1L
   private val TIMESTAMP = new Timestamp(System.currentTimeMillis())
+  private val AUTH_NUMBER = "1234"
 
 
   "checkExistingUser" should {
@@ -108,7 +109,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
       val result = service.sendAuthSMS(phoneNumber)
 
       // then
-      val expectedResult = Right()
+      val expectedResult = Right("success")
 
       result mustEqual(expectedResult)
     }
@@ -116,8 +117,14 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
   "return Right if sending sms is successful in case of existing customer" in new WithApplication() {
 
+    val customer = Customer(
+      authNumber = Option(AUTH_NUMBER),
+      createdAt = TIMESTAMP,
+      updatedAt = TIMESTAMP
+    )
+
     mockThirdParty.sendSMS(any, anyString) returns "success"
-    mockUserService.checkExistingUser(anyString) returns None
+    mockUserService.checkExistingUser(anyString) returns Some(customer)
     mockCustomerRepo.updateCustomer(any) returns 1
 
     // given
@@ -127,7 +134,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
     val result = service.sendAuthSMS(phoneNumber)
 
     // then
-    val expectedResult = Right()
+    val expectedResult = Right("success")
 
     result mustEqual(expectedResult)
   }

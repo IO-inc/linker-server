@@ -42,7 +42,7 @@ class UserService @Inject()(
     Await.result(userDetailFuture, Duration(3000, "millis"))
   }
 
-  def sendAuthSMS(phoneNumber: String): Either[String, _] = {
+  def sendAuthSMS(phoneNumber: String): Either[String, String] = {
 
     val authNumber = Common.createAuthSMSNumber
     val now = new Timestamp(System.currentTimeMillis())
@@ -55,15 +55,16 @@ class UserService @Inject()(
             customerRepo.updateCustomer(customer)
           }
           case None => {
-            customerRepo.createCustomer(Customer(
+            val customer = Customer(
               phoneNumber = Option(phoneNumber),
               authNumber = Option(authNumber),
               createdAt = now,
               updatedAt = now
-            ))
+            )
+            customerRepo.createCustomer(customer)
           }
         }
-        Right()
+        Right("success")
       }
       case _ => Left(ErrorMessage.FAIL_SMS_SEND)
     }

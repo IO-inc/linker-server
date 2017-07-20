@@ -9,6 +9,7 @@ import play.api.test.{WithApplication, PlaySpecification}
 class CheckRequestParametersSpec extends PlaySpecification with Mockito {
 
   "checkRequestParameters" should {
+
     "return Left() if there is the parameter that does not have value" in new WithApplication() {
 
       // given

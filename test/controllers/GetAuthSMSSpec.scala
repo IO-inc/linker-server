@@ -14,7 +14,7 @@ import services.{UserService, SwitcherService}
 class GetAuthSMSSpec extends PlaySpecification with Mockito {
 
   private val controllerComponents = stubControllerComponents()
-  private implicit val ec = controllerComponents.executionContext
+  private implicit val executionContext = controllerComponents.executionContext
 
   private val mockDeviceTokenRepo = mock[DeviceTokenRepo]
   private val mockSwitcherService = mock[SwitcherService]

@@ -26,7 +26,6 @@ class ThirdParty @Inject()(ws: WSClient) {
     val request = async {
       val response = await(ws.url(HOST + path).post(Json.obj("receivers" -> receivers, "content" -> content)))
       val status = ((response.json \ "status").as[String])
-      println("[status] " + status)
       status
     }
 

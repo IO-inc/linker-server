@@ -5,7 +5,7 @@ import javax.inject._
 import models._
 import data._
 import services.{UserService, SwitcherService}
-import common.{ThirdParty, Common, Request}
+import common.{Request}
 
 import play.api.libs.json.{JsValue, Writes, Json}
 import play.api.mvc._
@@ -19,7 +19,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject()(cc: ControllerComponents,
                                deviceTokenRepo: DeviceTokenRepo,
                                switcherService: SwitcherService,
-                               thirdParty: ThirdParty,
                                userService: UserService)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   // TODO: separate implicit writers
@@ -81,25 +80,13 @@ class UserController @Inject()(cc: ControllerComponents,
 
     Request.checkRequestParameters(parameterMap) match {
       case Right(_) => {
-
-        // generate auth number
-        val authNumber = Common.createAuthSMSNumber
-
-        //
-        thirdParty.sendSMS(List(phoneNumber), authNumber) match {
-          case "success" => {
-
-          }
-          case _ => Future.successful(Ok(Json.toJson(ErrorResponse(message = "sms error"))))
+        userService.sendAuthSMS(phoneNumber) match {
+          case Right(_) => Future.successful(Ok(Json.toJson(SuccessResponse())))
+          case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
         }
-        Future.successful(Ok(Json.toJson(ErrorResponse(message = "error"))))
       }
-      case Left(parameter) => {
-        val authNumber = Common.createAuthSMSNumber
-        println("[authNumber] " + authNumber)
+      case Left(parameter) =>
         Future.successful(Ok(Json.toJson(ErrorResponse(message = parameter + ErrorMessage.NO_REQUEST_PARAMETER))))
-      }
-
     }
   }
 

@@ -1,10 +1,9 @@
 package controllers
 
-import common.ThirdParty
-import data.{ErrorMessage, ErrorResponse}
+import data.{ErrorMessage}
 import models.DeviceTokenRepo
 import org.specs2.mock.Mockito
-import play.api.libs.json.{JsValue, Writes, Json}
+import play.api.libs.json.{Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, WithApplication, PlaySpecification}
 import services.{UserService, SwitcherService}
@@ -20,9 +19,8 @@ class GetAuthSMSSpec extends PlaySpecification with Mockito {
   private val mockDeviceTokenRepo = mock[DeviceTokenRepo]
   private val mockSwitcherService = mock[SwitcherService]
   private val mockUserService = mock[UserService]
-  private val mockThirdParty = mock[ThirdParty]
 
-  val controller = new UserController(controllerComponents, mockDeviceTokenRepo, mockSwitcherService, mockThirdParty, mockUserService)
+  val controller = new UserController(controllerComponents, mockDeviceTokenRepo, mockSwitcherService, mockUserService)
 
   private val PATH = "/v1/user/auth"
 
@@ -48,24 +46,48 @@ class GetAuthSMSSpec extends PlaySpecification with Mockito {
       status(result) must beEqualTo(OK)
       contentAsString(result) mustEqual(expectedResult)
     }
-
-    "return error response if sending auth sms is failed" in new WithApplication() {
-
-      // given
-      val fakeJson = Json.obj(
-        "phoneNumber" -> PHONE_NUMBER
-      )
-      val request = FakeRequest(POST, PATH)
-        .withJsonBody(fakeJson)
-
-      // when
-      val result = controller.getAuthSMS(request)
-
-      // then
-      val expectedResult = s"""{"status":"error","message":"phoneNumber${ErrorMessage.NO_REQUEST_PARAMETER}"}"""
-
-      status(result) must beEqualTo(OK)
-      contentAsString(result) mustEqual(expectedResult)
-    }
   }
+
+  "return error response if sending sms is failed" in new WithApplication() {
+
+    mockUserService.sendAuthSMS(anyString) returns Left(ErrorMessage.FAIL_SMS_SEND)
+
+    // given
+    val fakeJson = Json.obj(
+      "phoneNumber" -> PHONE_NUMBER
+    )
+    val request = FakeRequest(POST, PATH)
+      .withJsonBody(fakeJson)
+
+    // when
+    val result = controller.getAuthSMS(request)
+
+    // then
+    val expectedResult = s"""{"status":"error","message":"${ErrorMessage.FAIL_SMS_SEND}"}"""
+
+    status(result) must beEqualTo(OK)
+    contentAsString(result) mustEqual(expectedResult)
+  }
+
+  "return response if sending sms is successful" in new WithApplication() {
+
+    mockUserService.sendAuthSMS(anyString) returns Right("success")
+
+    // given
+    val fakeJson = Json.obj(
+      "phoneNumber" -> PHONE_NUMBER
+    )
+    val request = FakeRequest(POST, PATH)
+      .withJsonBody(fakeJson)
+
+    // when
+    val result = controller.getAuthSMS(request)
+
+    // then
+    val expectedResult = s"""{"status":"success","data":null}"""
+
+    status(result) must beEqualTo(OK)
+    contentAsString(result) mustEqual(expectedResult)
+  }
+
 }

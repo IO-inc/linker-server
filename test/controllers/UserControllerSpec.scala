@@ -1,6 +1,5 @@
 package controllers
 
-import common.ThirdParty
 import models.{DeviceTokenRepo}
 
 import org.specs2.mock.Mockito
@@ -21,9 +20,8 @@ class CreateDeviceTokenSpec extends PlaySpecification with Mockito {
   private val mockDeviceTokenRepo = mock[DeviceTokenRepo]
   private val mockSwitcherService = mock[SwitcherService]
   private val mockUserService = mock[UserService]
-  private val mockThirdParty = mock[ThirdParty]
 
-  val controller = new UserController(controllerComponents, mockDeviceTokenRepo, mockSwitcherService, mockThirdParty, mockUserService)
+  val controller = new UserController(controllerComponents, mockDeviceTokenRepo, mockSwitcherService, mockUserService)
 
   private val PATH = "/v1/user/token"
   private val ACCESS_TOKEN = "sdfkhsdkjfhsdkjfh"

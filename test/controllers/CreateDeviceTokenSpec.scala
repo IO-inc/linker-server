@@ -1,13 +1,13 @@
 package controllers
 
-import models.{DeviceTokenRepo}
+import data.ErrorMessage
 import common.Common
+import services.{UserService, SwitcherService}
 
 import org.specs2.mock.Mockito
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
-import services.{UserService, SwitcherService}
 
 /**
   * Created by Rachel on 2017. 7. 12..
@@ -18,11 +18,10 @@ class CreateDeviceTokenSpec extends PlaySpecification with Mockito {
   private val controllerComponents = stubControllerComponents()
   private implicit val executionContext = controllerComponents.executionContext
 
-  private val mockDeviceTokenRepo = mock[DeviceTokenRepo]
   private val mockSwitcherService = mock[SwitcherService]
   private val mockUserService = mock[UserService]
 
-  val controller = new UserController(controllerComponents, mockDeviceTokenRepo, mockSwitcherService, mockUserService)
+  val controller = new UserController(controllerComponents, mockSwitcherService, mockUserService)
 
   private val PATH = "/v1/user/token"
   private val ACCESS_TOKEN = "sdfkhsdkjfhsdkjfh"
@@ -35,7 +34,7 @@ class CreateDeviceTokenSpec extends PlaySpecification with Mockito {
     "return error response if access token does not exist" in new WithApplication() {
 
       // given
-      mockDeviceTokenRepo.createDeviceToken(anyString, anyString) returns Left("There is no access token")
+      mockUserService.createDeviceToken(anyString, anyString) returns Left(ErrorMessage.NO_ACCESS_TOKEN)
 
       val request = FakeRequest(POST, PATH)
                   .withJsonBody(Json.parse(s"""{ "token": "${TOKEN}" }"""))
@@ -54,7 +53,7 @@ class CreateDeviceTokenSpec extends PlaySpecification with Mockito {
     "return response if device token is successfully created" in new WithApplication() {
 
       // given
-      mockDeviceTokenRepo.createDeviceToken(anyString, anyString) returns Right(ID)
+      mockUserService.createDeviceToken(anyString, anyString) returns Right(ID)
 
       val request = FakeRequest(POST, PATH)
         .withJsonBody(Json.parse(s"""{ "token": "${TOKEN}" }"""))

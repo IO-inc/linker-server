@@ -17,7 +17,6 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 
 class UserController @Inject()(cc: ControllerComponents,
-                               deviceTokenRepo: DeviceTokenRepo,
                                switcherService: SwitcherService,
                                userService: UserService)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
@@ -48,7 +47,7 @@ class UserController @Inject()(cc: ControllerComponents,
     val authorization = request.headers.get("Authorization")
     val accessToken = authorization.get.split(" ")(1)
 
-    deviceTokenRepo.createDeviceToken(token, accessToken) match {
+    userService.createDeviceToken(token, accessToken) match {
       case Right(id) => Future.successful(Ok(Json.toJson(SuccessResponse(data = Option(Json.toJson(CreateDeviceTokenResponse(id)))))))
       case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
     }

@@ -20,25 +20,6 @@ class UserController @Inject()(cc: ControllerComponents,
                                switcherService: SwitcherService,
                                userService: UserService)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
-  // TODO: separate implicit writers
-  implicit val implicitCommandDataWrites = new Writes[Customer] {
-    def writes(model: Customer): JsValue = {
-      Json.obj(
-        "id" -> model.id,
-        "name" -> model.name,
-        "postNo" -> model.postNo
-      )
-    }
-  }
-
-  case class response(macAddress: String)
-
-  implicit val responseWrites = new Writes[Linker] {
-    def writes(l: Linker) = Json.obj(
-      "macAddress" -> l.macAddress
-    )
-  }
-
   def createDeviceToken = Action.async { implicit request: Request[AnyContent] =>
 
     val jsonBody: Option[JsValue] = request.body.asJson

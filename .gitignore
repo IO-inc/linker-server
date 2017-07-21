@@ -10,3 +10,8 @@ sbt-dist
 LICENSE
 sbt.bat
 
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

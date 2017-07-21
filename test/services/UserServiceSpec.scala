@@ -32,7 +32,9 @@ class UserServiceSpec extends PlaySpecification with Mockito {
   private val DEVICE_TOKEN = "1sdkfsdfdsf"
   private val ACCESS_TOKEN = "sfhsfkhskdjf"
   private val DEVICE_TOKEN_ID = 2L
-
+  private val ACCESS_TOKEN_ID = 3L
+  private val CUSTOMER_DEVICE_ID = 4L
+  private val LINKER_ID = 5L
 
   "checkExistingUser" should {
 
@@ -178,5 +180,102 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
       result mustEqual(expectedResult)
     }
+  }
+
+  "checkAccessToken" should {
+
+    "return Left(error) if there is no access token" in new WithApplication() {
+
+      /*val accessTokenInfo = AccessToken(
+        id = ACCESS_TOKEN_ID,
+        accessToken = Some(ACCESS_TOKEN),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+      */
+      mockAccessTokenRepo.findByAccessToken(anyString) returns None
+
+      // given
+      val accessToken = ACCESS_TOKEN
+
+      // when
+      val result = service.checkAccessToken(accessToken)
+
+      // then
+      val expectedResult = Left(ErrorMessage.NO_ACCESS_TOKEN)
+
+      result mustEqual(expectedResult)
+    }
+
+    "return Right(accessToken) if there is access token" in new WithApplication() {
+
+      val accessTokenInfo = AccessToken(
+        id = ACCESS_TOKEN_ID,
+        accessToken = Some(ACCESS_TOKEN),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      mockAccessTokenRepo.findByAccessToken(anyString) returns Some(accessTokenInfo)
+
+      // given
+      val accessToken = ACCESS_TOKEN
+
+      // when
+      val result = service.checkAccessToken(accessToken)
+
+      // then
+      val expectedResult = Right(accessTokenInfo)
+
+      result mustEqual(expectedResult)
+    }
+  }
+
+  "getUserDetail" should {
+
+    "return (customer, linker list) if there is user detail by access token" in new WithApplication() {
+
+      val customerDevice = CustomerDevice(
+        id = CUSTOMER_DEVICE_ID,
+        customerId = Some(CUSTOMER_ID),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      val customer = Customer(
+        id = CUSTOMER_ID,
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      val linker = Linker(
+        id = LINKER_ID,
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      val linkerList = Seq(linker)
+
+      mockCustomerRepo.findCustomerDeviceId(anyLong) returns Future(Some(customerDevice))
+      mockCustomerRepo.findById(anyLong) returns Future(Some(customer))
+      mockCustomerRepo.findLinkerListByCustomerId(anyLong) returns linkerList
+
+      // given
+      val accessToken = AccessToken(
+        id = ACCESS_TOKEN_ID,
+        accessToken = Some(ACCESS_TOKEN),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      // when
+      val result = service.getUserDetail(accessToken)
+
+      // then
+      val expectedResult = (customer, linkerList)
+
+      result mustEqual(expectedResult)
+    }
+
   }
 }

@@ -2,13 +2,13 @@ package controllers
 
 import java.sql.Timestamp
 
-import models.{Linker, Customer, AccessToken, DeviceTokenRepo}
+import models.{Linker, Customer, AccessToken}
 import common.Common
+import services.{UserService, SwitcherService}
 
 import org.specs2.mock.Mockito
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, WithApplication, PlaySpecification}
-import services.{UserService, SwitcherService}
 
 /**
   * Created by Rachel on 2017. 7. 13..
@@ -18,11 +18,10 @@ class GetUserDetailSpec extends PlaySpecification with Mockito {
   private val controllerComponents = stubControllerComponents()
   private implicit val executionContext = controllerComponents.executionContext
 
-  private val mockDeviceTokenRepo = mock[DeviceTokenRepo]
   private val mockSwitcherService = mock[SwitcherService]
   private val mockUserService = mock[UserService]
 
-  val controller = new UserController(controllerComponents, mockDeviceTokenRepo, mockSwitcherService, mockUserService)
+  val controller = new UserController(controllerComponents, mockSwitcherService, mockUserService)
 
   private val PATH = "/v1/user/detail"
   private val ACCESS_TOKEN = "sdfkhsdkjfhsdkjfh"

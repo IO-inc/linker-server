@@ -21,20 +21,19 @@ case class Customer(
 
 case class CustomerDevice(
                            id: Long,
-                           customerId: Option[Long],
-                           uuid: Option[String],
+                           customerId: Option[Long] = None,
+                           uuid: Option[String] = None,
                            createdAt: Timestamp,
                            updatedAt: Timestamp,
-                           deletedAt: Option[Timestamp]
-                         )
+                           deletedAt: Option[Timestamp] = None)
 
 case class AccessToken(
                         id: Long,
-                        customerDeviceId: Option[Long],
-                        accessToken: Option[String],
+                        customerDeviceId: Option[Long] = None,
+                        accessToken: Option[String] = None,
                         createdAt: Timestamp,
                         updatedAt: Timestamp,
-                        deletedAt: Option[Timestamp])
+                        deletedAt: Option[Timestamp] = None)
 
 case class DeviceToken(
                         id: Long,
@@ -46,11 +45,10 @@ case class DeviceToken(
 
 case class Linker(
                    id: Long,
-                   macAddress: Option[String],
+                   macAddress: Option[String] = None,
                    createdAt: Timestamp,
                    updatedAt: Timestamp,
-                   deletedAt: Option[Timestamp]
-                 )
+                   deletedAt: Option[Timestamp] = None)
 
 case class Purchase(
                      id: Long,

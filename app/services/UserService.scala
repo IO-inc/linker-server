@@ -17,6 +17,7 @@ import scala.concurrent.{Await}
 class UserService @Inject()(
                              accessTokenRepo: AccessTokenRepo,
                              customerRepo: CustomerRepo,
+                             deviceTokenRepo: DeviceTokenRepo,
                              thirdParty: ThirdParty) {
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,6 +25,13 @@ class UserService @Inject()(
   def checkAccessToken(accessToken: String): Either[String, AccessToken] = {
     accessTokenRepo.findByAccessToken(accessToken) match {
       case Some(accessToken) => Right(accessToken)
+      case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
+    }
+  }
+
+  def createDeviceToken(token: String, accessToken: String): Either[String, Long] = {
+    deviceTokenRepo.createDeviceToken(token, accessToken) match {
+      case Some(id) => Right(id)
       case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
     }
   }

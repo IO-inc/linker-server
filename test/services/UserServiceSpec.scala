@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import common.{ThirdParty, Common}
 import data.ErrorMessage
-import models.{AccessTokenRepo, Customer, CustomerRepo}
+import models._
 import org.specs2.mock.Mockito
 import play.api.test.{PlaySpecification, WithApplication}
 
@@ -19,15 +19,19 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
   private val mockAccessTokenRepo = mock[AccessTokenRepo]
   private val mockCustomerRepo = mock[CustomerRepo]
+  private val mockDeviceTokenRepo = mock[DeviceTokenRepo]
   private val mockThirdParty = mock[ThirdParty]
   private val mockUserService = mock[UserService]
 
-  val service = new UserService(mockAccessTokenRepo, mockCustomerRepo, mockThirdParty)
+  val service = new UserService(mockAccessTokenRepo, mockCustomerRepo, mockDeviceTokenRepo, mockThirdParty)
 
   private val PHONE_NUMBER = "01028688487"
   private val CUSTOMER_ID = 1L
   private val TIMESTAMP = new Timestamp(System.currentTimeMillis())
   private val AUTH_NUMBER = "1234"
+  private val DEVICE_TOKEN = "1sdkfsdfdsf"
+  private val ACCESS_TOKEN = "sfhsfkhskdjf"
+  private val DEVICE_TOKEN_ID = 2L
 
 
   "checkExistingUser" should {
@@ -137,5 +141,42 @@ class UserServiceSpec extends PlaySpecification with Mockito {
     val expectedResult = Right(Common.SUCCESS)
 
     result mustEqual(expectedResult)
+  }
+
+  "createDeviceToken" should {
+
+    "return Some(id) if creating device token is successful" in new WithApplication() {
+
+      mockDeviceTokenRepo.createDeviceToken(anyString, anyString) returns Some(DEVICE_TOKEN_ID)
+
+      // given
+      val deviceToken = DEVICE_TOKEN
+      val accessToken = ACCESS_TOKEN
+
+      // when
+      val result = service.createDeviceToken(deviceToken, accessToken)
+
+      // then
+      val expectedResult = Right(DEVICE_TOKEN_ID)
+
+      result mustEqual(expectedResult)
+    }
+
+    "return None if creating device token is failed because access token does not exist" in new WithApplication() {
+
+      mockDeviceTokenRepo.createDeviceToken(anyString, anyString) returns None
+
+      // given
+      val deviceToken = DEVICE_TOKEN
+      val accessToken = ACCESS_TOKEN
+
+      // when
+      val result = service.createDeviceToken(deviceToken, accessToken)
+
+      // then
+      val expectedResult = Left(ErrorMessage.NO_ACCESS_TOKEN)
+
+      result mustEqual(expectedResult)
+    }
   }
 }

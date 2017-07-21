@@ -5,6 +5,7 @@ import javax.inject._
 import models._
 import data._
 import services.{UserService, SwitcherService}
+import common.{Request}
 
 import play.api.libs.json.{JsValue, Writes, Json}
 import play.api.mvc._
@@ -17,7 +18,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()(cc: ControllerComponents,
                                deviceTokenRepo: DeviceTokenRepo,
-                               accessTokenRepo: AccessTokenRepo,
                                switcherService: SwitcherService,
                                userService: UserService)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
@@ -69,6 +69,24 @@ class UserController @Inject()(cc: ControllerComponents,
         Future.successful(Ok(Json.toJson(SuccessResponse(data = Option(Json.toJson(userDetail))))))
       }
       case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
+    }
+  }
+
+  def getAuthSMS = Action.async { implicit request: Request[AnyContent] =>
+
+    val jsonBody: Option[JsValue] = request.body.asJson
+    val phoneNumber = (jsonBody.get \ "phoneNumber").as[String]
+    val parameterMap = Map("phoneNumber" -> phoneNumber)
+
+    Request.checkRequestParameters(parameterMap) match {
+      case Right(_) => {
+        userService.sendAuthSMS(phoneNumber) match {
+          case Right(_) => Future.successful(Ok(Json.toJson(SuccessResponse())))
+          case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
+        }
+      }
+      case Left(parameter) =>
+        Future.successful(Ok(Json.toJson(ErrorResponse(message = parameter + ErrorMessage.NO_REQUEST_PARAMETER))))
     }
   }
 

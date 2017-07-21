@@ -1,14 +1,13 @@
 package models
 
 import Tables._
-
 import javax.inject.Inject
 
+import common.Common
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await}
 
 /**
   * Created by Rachel on 2017. 7. 13..
@@ -33,6 +32,6 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
           case result => result
           case None => None
         }
-      }, Duration(3000, "millis"))
+      }, Common.COMMON_ASYNC_DURATION)
   }
 }

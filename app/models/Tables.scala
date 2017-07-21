@@ -7,17 +7,17 @@ import java.sql.Timestamp
   */
 
 case class Customer(
-                     id: Long,
-                     phoneNumber: Option[String],
-                     name: Option[String],
-                     authNumber: Option[String],
-                     postNo: Option[String],
-                     addr1: Option[String],
-                     addr2: Option[String],
-                     email: Option[String],
-                     createdAt: Timestamp,
-                     updatedAt: Timestamp,
-                     deletedAt: Option[Timestamp])
+                     id: Long = 0,
+                     phoneNumber: Option[String] = None,
+                     var name: Option[String] = None,
+                     var authNumber: Option[String] = None,
+                     var postNo: Option[String] = None,
+                     var addr1: Option[String] = None,
+                     var addr2: Option[String] = None,
+                     var email: Option[String] = None,
+                     var createdAt: Timestamp,
+                     var updatedAt: Timestamp,
+                     var deletedAt: Option[Timestamp] = None)
 
 case class CustomerDevice(
                            id: Long,

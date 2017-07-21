@@ -1,13 +1,12 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-
+import common.Common
 import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 
 import scala.async.Async._
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 /**
   * Created by Rachel on 2017. 7. 17..
@@ -32,7 +31,7 @@ class SwitcherService @Inject()(ws: WSClient) {
       (switcherList, requestList)
     }
 
-    Await.result(request, Duration(3000, "millis"))
+    Await.result(request, Common.COMMON_ASYNC_DURATION)
   }
 
 }

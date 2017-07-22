@@ -25,17 +25,18 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   private def __findByAccessToken(accessToken: String): DBIO[Option[AccessToken]] =
     AccessTokens.filter(_.accessToken === accessToken).result.headOption
 
+  private def __findByCustomerDeviceId(customerDeviceId: Long): DBIO[Option[AccessToken]] =
+    AccessTokens.filter(_.customerDeviceId === customerDeviceId).result.headOption
+
   private def __insert(accessToken: AccessToken): DBIO[Long] =
     AccessTokens returning AccessTokens.map(_.id) += accessToken
 
   def findByAccessToken(accessToken: String): Option[AccessToken] = {
-    Await.result(
-      db.run(__findByAccessToken(accessToken)).map { accessTokenResult =>
-        accessTokenResult match {
-          case result => result
-          case None => None
-        }
-      }, Common.COMMON_ASYNC_DURATION)
+    Await.result(db.run(__findByAccessToken(accessToken)), Common.COMMON_ASYNC_DURATION)
+  }
+
+  def findByCustomerDeviceId(customerDeviceId: Long): Option[AccessToken] = {
+    Await.result(db.run(__findByCustomerDeviceId(customerDeviceId)), Common.COMMON_ASYNC_DURATION)
   }
 
   def insertAccessToken(accessToken: AccessToken): Long = {

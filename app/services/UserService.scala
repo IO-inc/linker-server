@@ -17,7 +17,9 @@ import scala.concurrent.{Await}
 class UserService @Inject()(
                              accessTokenRepo: AccessTokenRepo,
                              customerRepo: CustomerRepo,
+                             customerDeviceRepo: CustomerDeviceRepo,
                              deviceTokenRepo: DeviceTokenRepo,
+                             authService: AuthService,
                              thirdParty: ThirdParty) {
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -81,4 +83,58 @@ class UserService @Inject()(
     Await.result(customerRepo.findByPhoneNumber(phoneNumber), Common.COMMON_ASYNC_DURATION)
   }
 
+  def checkAuthSMS(phoneNumber: String, authNumber: String, uuid: String): Either[String, String] = {
+    Await.result(customerRepo.findByPhoneNumber(phoneNumber), Common.COMMON_ASYNC_DURATION) match {
+      case Some(customer) => {
+        customer.authNumber.get == authNumber match {
+          case true => {
+            val accessToken = getAccessToken(customer.id, phoneNumber, uuid)
+            Right(accessToken)
+          }
+          case false => Left(ErrorMessage.INVALID_AUTH_NUMBER)
+        }
+      }
+      case None => Left(ErrorMessage.NO_CUSTOMER)
+    }
+  }
+
+  def getAccessToken(customerId: Long, phoneNumber: String, uuid: String): String = {
+
+    val now = new Timestamp(System.currentTimeMillis())
+
+    customerDeviceRepo.findByCustomerId(customerId, uuid) match {
+      case Some(customerDevice) => {
+        val customerDeviceId = customerDevice.id
+        accessTokenRepo.findByCustomerDeviceId(customerDeviceId) match {
+          case Some(accessTokenInfo) => accessTokenInfo.accessToken.get
+        }
+      }
+      case None => {
+        val createAccessTokenFuture = async {
+          val accessToken = authService.getAccessToken(phoneNumber)
+          val customerDevice = CustomerDevice(
+            0,
+            Some(customerId),
+            Some(uuid),
+            now,
+            now,
+            None
+          )
+          val customerDeviceId = customerDeviceRepo.insertCustoemrDevice(customerDevice)
+
+          val accessTokenInfo = AccessToken(
+            0,
+            Some(customerDeviceId),
+            Some(accessToken),
+            now,
+            now,
+            None
+          )
+          accessTokenRepo.insertAccessToken(accessTokenInfo)
+          accessToken
+        }
+        Await.result(createAccessTokenFuture, Common.COMMON_ASYNC_DURATION)
+      }
+    }
+  }
 }

@@ -19,11 +19,14 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
   private val mockAccessTokenRepo = mock[AccessTokenRepo]
   private val mockCustomerRepo = mock[CustomerRepo]
+  private val mockCustomerDeviceRepo = mock[CustomerDeviceRepo]
   private val mockDeviceTokenRepo = mock[DeviceTokenRepo]
   private val mockThirdParty = mock[ThirdParty]
   private val mockUserService = mock[UserService]
+  private val mockAuthService = mock[AuthService]
 
-  val service = new UserService(mockAccessTokenRepo, mockCustomerRepo, mockDeviceTokenRepo, mockThirdParty)
+  val service = new UserService(
+    mockAccessTokenRepo, mockCustomerRepo, mockCustomerDeviceRepo, mockDeviceTokenRepo, mockAuthService, mockThirdParty)
 
   private val PHONE_NUMBER = "01028688487"
   private val CUSTOMER_ID = 1L
@@ -35,6 +38,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
   private val ACCESS_TOKEN_ID = 3L
   private val CUSTOMER_DEVICE_ID = 4L
   private val LINKER_ID = 5L
+  private val UUID = "321"
 
   "checkExistingUser" should {
 
@@ -276,6 +280,149 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
       result mustEqual(expectedResult)
     }
+  }
+
+  "checkAuthSMS" should {
+
+    "return Left(error) if there is no customer by phone number" in new WithApplication() {
+
+      mockCustomerRepo.findByPhoneNumber(anyString) returns Future(None)
+
+      // given
+      val phoneNumber = PHONE_NUMBER
+      val authNumber = AUTH_NUMBER
+      val uuid = UUID
+
+      // when
+      val result = service.checkAuthSMS(phoneNumber, authNumber, uuid)
+
+      // then
+      val expectedResult = Left(ErrorMessage.NO_CUSTOMER)
+
+      result mustEqual(expectedResult)
+    }
+
+    "return Left(error) if auth number is not correct" in new WithApplication() {
+
+      val customer = Customer(
+        id = CUSTOMER_ID,
+        authNumber = Some(AUTH_NUMBER),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      mockCustomerRepo.findByPhoneNumber(anyString) returns Future(Some(customer))
+
+      // given
+      val phoneNumber = PHONE_NUMBER
+      val wrongAuthNumber = "1111"
+      val uuid = UUID
+
+      // when
+      val result = service.checkAuthSMS(phoneNumber, wrongAuthNumber, uuid)
+
+      // then
+      val expectedResult = Left(ErrorMessage.INVALID_AUTH_NUMBER)
+
+      result mustEqual(expectedResult)
+    }
+
+    "return Right(access token) if auth number is correct" in new WithApplication() {
+
+      val customer = Customer(
+        id = CUSTOMER_ID,
+        authNumber = Some(AUTH_NUMBER),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      val customerDevice = CustomerDevice(
+        id = CUSTOMER_DEVICE_ID,
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      val accessToken = AccessToken(
+        id = ACCESS_TOKEN_ID,
+        accessToken = Some(ACCESS_TOKEN),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      mockCustomerRepo.findByPhoneNumber(anyString) returns Future(Some(customer))
+      mockCustomerDeviceRepo.findByCustomerId(anyLong, anyString) returns Some(customerDevice)
+      mockAccessTokenRepo.findByCustomerDeviceId(anyLong) returns Some(accessToken)
+
+      // given
+      val phoneNumber = PHONE_NUMBER
+      val wrongAuthNumber = AUTH_NUMBER
+      val uuid = UUID
+
+      // when
+      val result = service.checkAuthSMS(phoneNumber, wrongAuthNumber, uuid)
+
+      // then
+      val expectedResult = Right(ACCESS_TOKEN)
+
+      result mustEqual(expectedResult)
+    }
 
   }
+
+  "getAccessToken" should {
+
+    "return access token if there is no customer device" in new WithApplication() {
+      mockCustomerDeviceRepo.findByCustomerId(anyLong, anyString) returns None
+      mockAuthService.getAccessToken(anyString) returns ACCESS_TOKEN
+      mockCustomerDeviceRepo.insertCustoemrDevice(any) returns CUSTOMER_DEVICE_ID
+      mockAccessTokenRepo.insertAccessToken(any) returns ACCESS_TOKEN_ID
+
+      // given
+      val customerId = CUSTOMER_ID
+      val phoneNumber = PHONE_NUMBER
+      val uuid = UUID
+
+      // when
+      val result = service.getAccessToken(customerId, phoneNumber, uuid)
+
+      // then
+      val expectedResult = ACCESS_TOKEN
+
+      result mustEqual(expectedResult)
+    }
+
+    "return access token if there is existing customer device" in new WithApplication() {
+
+      val customerDevice = CustomerDevice(
+        id = CUSTOMER_DEVICE_ID,
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      val accessToken = AccessToken(
+        id = ACCESS_TOKEN_ID,
+        accessToken = Some(ACCESS_TOKEN),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      mockCustomerDeviceRepo.findByCustomerId(anyLong, anyString) returns Some(customerDevice)
+      mockAccessTokenRepo.findByCustomerDeviceId(anyLong) returns Some(accessToken)
+
+      // given
+      val customerId = CUSTOMER_ID
+      val phoneNumber = PHONE_NUMBER
+      val uuid = UUID
+
+      // when
+      val result = service.getAccessToken(customerId, phoneNumber, uuid)
+
+      // then
+      val expectedResult = ACCESS_TOKEN
+
+      result mustEqual(expectedResult)
+    }
+
+  }
+
 }

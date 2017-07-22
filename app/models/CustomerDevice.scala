@@ -21,14 +21,14 @@ class CustomerDeviceRepo @Inject()(protected val dbConfigProvider: DatabaseConfi
 
   private[models] val CustomerDevices = TableQuery[CustomerDevicesTable]
 
-  private def __findByCustomerId(customerId: Long): DBIO[Option[CustomerDevice]] =
-    CustomerDevices.filter(_.customerId === customerId).result.headOption
+  private def __findByCustomerId(customerId: Long, uuid: String): DBIO[Option[CustomerDevice]] =
+    CustomerDevices.filter(_.customerId === customerId).filter(_.uuid === uuid).result.headOption
 
   private def __insert(customerDevice: CustomerDevice): DBIO[Long] =
     CustomerDevices returning CustomerDevices.map(_.id) += customerDevice
 
-  def findByCustomerId(customerId: Long): Option[CustomerDevice] = {
-    Await.result(db.run(__findByCustomerId(customerId)), Common.COMMON_ASYNC_DURATION)
+  def findByCustomerId(customerId: Long, uuid: String): Option[CustomerDevice] = {
+    Await.result(db.run(__findByCustomerId(customerId, uuid)), Common.COMMON_ASYNC_DURATION)
   }
 
   def insertCustoemrDevice(customerDevice: CustomerDevice): Long = {

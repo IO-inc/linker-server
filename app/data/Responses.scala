@@ -16,6 +16,8 @@ case class GetUserDetailResponse(
                                 switcherList: List[String],
                                 requestList: List[String]
                                 )
+case class GetAuthInfoResponse(
+                              accessToken: String)
 
 object SuccessResponse {
 
@@ -70,6 +72,17 @@ object GetUserDetailResponse {
         "linkerList" -> response.linkerList,
         "switcherList" -> response.switcherList,
         "requestList" -> response.requestList
+      )
+    }
+  }
+}
+
+object GetAuthInfoResponse {
+
+  implicit val implicitGetAuthInfoResponse = new Writes[GetAuthInfoResponse] {
+    def writes(response: GetAuthInfoResponse): JsValue = {
+      Json.obj(
+        "accessToken" -> response.accessToken
       )
     }
   }

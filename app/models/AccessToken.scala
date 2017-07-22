@@ -25,6 +25,9 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   private def __findByAccessToken(accessToken: String): DBIO[Option[AccessToken]] =
     AccessTokens.filter(_.accessToken === accessToken).result.headOption
 
+  private def __insert(accessToken: AccessToken): DBIO[Long] =
+    AccessTokens returning AccessTokens.map(_.id) += accessToken
+
   def findByAccessToken(accessToken: String): Option[AccessToken] = {
     Await.result(
       db.run(__findByAccessToken(accessToken)).map { accessTokenResult =>
@@ -33,5 +36,9 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
           case None => None
         }
       }, Common.COMMON_ASYNC_DURATION)
+  }
+
+  def insertAccessToken(accessToken: AccessToken): Long = {
+    Await.result(db.run(__insert(accessToken)), Common.COMMON_ASYNC_DURATION)
   }
 }

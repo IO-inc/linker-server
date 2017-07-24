@@ -25,8 +25,8 @@ class LinkerDetailRepo @Inject()(protected val dbConfigProvider: DatabaseConfigP
 
     val query = for {
       (_, linkerDetail) <-
-      Linkers.filter(_.macAddress === macAddress)
-        .join(LinkerDetails).on(_.id === _.linkerId)
+      Linkers.filter(_.macAddress === macAddress).filter(_.deletedAt.isEmpty)
+        .join(LinkerDetails).on(_.id === _.linkerId).filter(_._2.deletedAt.isEmpty)
     } yield (linkerDetail)
 
     Option(Await.result(db.run(query.result), Common.COMMON_ASYNC_DURATION))

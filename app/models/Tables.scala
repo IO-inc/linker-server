@@ -52,23 +52,43 @@ case class Linker(
 
 case class Purchase(
                      id: Long,
-                     linkerId: Option[Long],
-                     customerId: Option[Long],
-                     price: Option[String],
-                     warrantyDate: Option[Timestamp],
+                     linkerId: Option[Long] = None,
+                     customerId: Option[Long] = None,
+                     price: Option[String] = None,
+                     warrantyDate: Option[Timestamp] = None,
                      createdAt: Timestamp,
                      updatedAt: Timestamp,
-                     deletedAt: Option[Timestamp]
-                   )
+                     deletedAt: Option[Timestamp] = None)
 
 case class PurchaseOwner(
                           id: Long,
-                          purchaseId: Option[Long],
-                          customerId: Option[Long],
+                          purchaseId: Option[Long] = None,
+                          customerId: Option[Long] = None,
                           createdAt: Timestamp,
                           updatedAt: Timestamp,
-                          deletedAt: Option[Timestamp]
-                        )
+                          deletedAt: Option[Timestamp] = None)
+
+case class LinkerDetails(
+                        id: Long,
+                        linkerId: Option[Long] = None,
+                        status: Option[String] = None,
+                        pKey: Option[String] = None,
+                        shareCode: Option[String] = None,
+                        active: Option[Boolean] = None,
+                        createdAt: Timestamp,
+                        updatedAt: Timestamp,
+                        deletedAt: Option[Timestamp] = None)
+
+case class Things(
+                 id: Long,
+                 linkerId: Option[Long] = None,
+                 `type`: Option[String] = None,
+                 macAddress: Option[String] = None,
+                 active: Option[Boolean] = None,
+                 createdAt: Timestamp,
+                 updatedAt: Timestamp,
+                 deletedAt: Option[Timestamp] = None)
+
 
 object Tables extends {
   val profile = slick.jdbc.MySQLProfile

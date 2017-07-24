@@ -22,7 +22,7 @@ class PurchaseRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
   private[models] val PurchaseOwners = TableQuery[PurchaseOwnersTable]
   private[models] val Customers = TableQuery[CustomersTable]
 
-  def findHost(customerId: Long, linkerId: Long): Option[Customer] = {
+  def findHost(customerId: Long, linkerId: Long): Seq[Customer] = {
 
     val query = for {
       ((_, _), customer) <-
@@ -31,6 +31,6 @@ class PurchaseRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
         .join(Customers).on(_._2.customerId === _.id)
     } yield (customer)
 
-    Option(Await.result(db.run(query.result), Common.COMMON_ASYNC_DURATION).head)
+    Await.result(db.run(query.result), Common.COMMON_ASYNC_DURATION)
   }
 }

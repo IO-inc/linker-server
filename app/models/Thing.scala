@@ -20,10 +20,10 @@ class ThingRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   private[models] val Things = TableQuery[ThingsTable]
 
-  private def __findByLinkerId(linkerId: Long): DBIO[Option[Thing]] =
-    Things.filter(_.linkerId === linkerId).filter(_.deletedAt.isEmpty).result.headOption
+  private def __findByLinkerId(linkerId: Long): DBIO[Seq[Thing]] =
+    Things.filter(_.linkerId === linkerId).filter(_.deletedAt.isEmpty).result
 
-  def findByLinkerId(linkerId: Long): Option[Thing] =
+  def findByLinkerId(linkerId: Long): Seq[Thing] =
     Await.result(db.run(__findByLinkerId(linkerId)), Common.COMMON_ASYNC_DURATION)
 
 }

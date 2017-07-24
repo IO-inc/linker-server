@@ -68,7 +68,7 @@ case class PurchaseOwner(
                           updatedAt: Timestamp,
                           deletedAt: Option[Timestamp] = None)
 
-case class LinkerDetails(
+case class LinkerDetail(
                         id: Long,
                         linkerId: Option[Long] = None,
                         status: Option[String] = None,
@@ -207,5 +207,23 @@ trait Tables {
   }
 
   lazy val PurchaseOwnersTable = new TableQuery(tag => new PurchaseOwnersTable(tag))
+
+  /* LinkerDetails Table Definitions */
+  class LinkerDetailsTable(_tableTag: Tag) extends profile.api.Table[LinkerDetail](_tableTag, "LinkerDetails") {
+
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def linkerId = column[Option[Long]]("linkerId")
+    def status = column[Option[String]]("status")
+    def pKey = column[Option[String]]("pKey")
+    def shareCode = column[Option[String]]("shareCode")
+    def active = column[Option[Boolean]]("active")
+    def createdAt = column[Timestamp]("createdAt")
+    def updatedAt = column[Timestamp]("updatedAt")
+    def deletedAt = column[Option[Timestamp]]("deletedAt")
+
+    def * = (id, linkerId, status, pKey, shareCode, active, createdAt, updatedAt, deletedAt) <> (LinkerDetail.tupled, LinkerDetail.unapply)
+  }
+
+  lazy val LinkerDetailsTable = new TableQuery(tag => new LinkerDetailsTable(tag))
 }
 

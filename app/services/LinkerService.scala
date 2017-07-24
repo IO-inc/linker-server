@@ -8,7 +8,7 @@ import data.ErrorMessage
 import models.LinkerDetailRepo
 import models._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.{async}
 import scala.concurrent.Await
 
 /**
@@ -22,7 +22,7 @@ class LinkerService @Inject()(
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def getLinkerDetail(macAddress: String, customerId: Long): Either[String, (LinkerDetail, Option[Customer], Option[Seq[Thing]])] = {
+  def getLinkerDetail(macAddress: String, customerId: Long): Either[String, (LinkerDetail, Option[Customer], Seq[Thing])] = {
 
     linkerDetailRepo.findLinkerDetailByMacAddress(macAddress) match {
       case Some(linkerDetailList) => {
@@ -31,46 +31,15 @@ class LinkerService @Inject()(
 
         val customerAndThingDetailFuture = async {
           val customerOption = purchaseRepo.findHost(customerId, linkerId)
-          val thingListOption = thingRepo.findByLinkerId(linkerId)
+          val thingList = thingRepo.findByLinkerId(linkerId)
 
-          (linkerDetail, customerOption, thingListOption)
+          (linkerDetail, customerOption, thingList)
         }
 
-//        Await.result(customerAndThingDetailFuture, Common.COMMON_ASYNC_DURATION)
-        Left(ErrorMessage.NO_LINKER)
+        Right(Await.result(customerAndThingDetailFuture, Common.COMMON_ASYNC_DURATION))
       }
       case None => Left(ErrorMessage.NO_LINKER)
     }
-
-
-
-   /* val linkerDetailFuture = async {
-      val linkerDetailOption = linkerDetailRepo.findLinkerDetailByMacAddress(macAddress)
-      linkerDetailOption match {
-        case None => return Left(ErrorMessage.NO_LINKER)
-      }
-      val customerOption = purchaseRepo.findHost(customerId, linkerDetailOption.get.head.linkerId.get)
-      customerOption match {
-        case None => return Left(ErrorMessage.NO_HOST)
-      }
-//      val thingList =
-
-    }
-
-    Await.result(linkerDetailFuture, Common.COMMON_ASYNC_DURATION)*/
-
-    /*linkerDetailRepo.findLinkerDetailByMacAddress(macAddress) match {
-      case Some(linkerDetailList) => {
-        val linkerDetail = linkerDetailList.head
-
-        purchaseRepo.findHost(customerId, linkerDetail.id) match {
-          case Some(customer) => Left("")
-          case None => Left(ErrorMessage.NO_HOST)
-        }
-      }
-      case None => Left(ErrorMessage.NO_LINKER)
-    }*/
-
   }
 
 

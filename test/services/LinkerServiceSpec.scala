@@ -3,7 +3,7 @@ package services
 import java.sql.Timestamp
 
 import data.ErrorMessage
-import models.{LinkerDetail, LinkerDetailRepo, PurchaseRepo, ThingRepo}
+import models._
 import org.specs2.mock.Mockito
 import play.api.test.{PlaySpecification, WithApplication}
 
@@ -25,6 +25,7 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
   private val LINKER_ID = 2L
   private val LINKER_DETAIL_ID = 3L
   private val TIMESTAMP = new Timestamp(System.currentTimeMillis())
+  private val THING_ID = 4L
 
   "getLinkerDetail" should {
 
@@ -45,7 +46,7 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
       result mustEqual(expectedResult)
     }
 
-    /*"return Left(error) if there is no host by customer id and linker id" in new WithApplication() {
+    "return Right(linker detail, customer, thing list) if there is linker by mac address" in new WithApplication() {
 
       val linkerDetailList = Seq(
         LinkerDetail(
@@ -55,8 +56,23 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
           updatedAt = TIMESTAMP
         )
       )
+
+      val customer = Customer(
+        id = CUSTOMER_ID,
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      val thingList = Seq(
+        Thing(
+          id = THING_ID,
+          createdAt = TIMESTAMP,
+          updatedAt = TIMESTAMP
+        )
+      )
       mockLinkerDetailRepo.findLinkerDetailByMacAddress(anyString) returns Some(linkerDetailList)
-      mockPurchaseRepo.findHost(anyLong, anyLong) returns None
+      mockPurchaseRepo.findHost(anyLong, anyLong) returns Some(customer)
+      mockThingRepo.findByLinkerId(anyLong) returns thingList
 
       // given
       val macAddress = MAC_ADDRESS
@@ -66,10 +82,10 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
       val result = service.getLinkerDetail(macAddress, customerId)
 
       // then
-      val expectedResult = Left(ErrorMessage.NO_HOST)
+      val expectedResult = Right(linkerDetailList.head, Some(customer), thingList)
 
       result mustEqual(expectedResult)
-    }*/
+    }
 
   }
 

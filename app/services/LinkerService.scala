@@ -22,23 +22,24 @@ class LinkerService @Inject()(
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def getLinkerDetail(macAddress: String, customerId: Long): Either[String, (LinkerDetail, Option[Customer], Seq[Thing])] = {
+  def getLinkerDetail(macAddress: String, customerId: Long): Either[String, (LinkerDetail, Seq[Customer], Seq[Thing])] = {
 
     linkerDetailRepo.findLinkerDetailByMacAddress(macAddress) match {
       case Some(linkerDetailList) => {
+        if (linkerDetailList.isEmpty) return Left(ErrorMessage.NO_LINKER)
+
         val linkerDetail = linkerDetailList.head
         val linkerId = linkerDetail.linkerId.get
 
         val customerAndThingDetailFuture = async {
-          val customerOption = purchaseRepo.findHost(customerId, linkerId)
+          val customerList = purchaseRepo.findHost(customerId, linkerId)
           val thingList = thingRepo.findByLinkerId(linkerId)
 
-          (linkerDetail, customerOption, thingList)
+          (linkerDetail, customerList, thingList)
         }
 
         Right(Await.result(customerAndThingDetailFuture, Common.COMMON_ASYNC_DURATION))
       }
-      case None => Left(ErrorMessage.NO_LINKER)
     }
   }
 

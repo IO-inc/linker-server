@@ -12,8 +12,6 @@ import play.api.test.{PlaySpecification, WithApplication}
   */
 class LinkerServiceSpec extends PlaySpecification with Mockito {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   val mockLinkerDetailRepo = mock[LinkerDetailRepo]
   val mockPurchaseRepo = mock[PurchaseRepo]
   val mockThingRepo = mock[ThingRepo]
@@ -29,9 +27,11 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
 
   "getLinkerDetail" should {
 
-    "return Left(error) if there is no linker detail by mac address" in new WithApplication() {
+    "return Left(error) if linker detail list is empty" in new WithApplication() {
 
-      mockLinkerDetailRepo.findLinkerDetailByMacAddress(anyString) returns None
+      val linkerDetailList = Seq[LinkerDetail]()
+
+      mockLinkerDetailRepo.findLinkerDetailByMacAddress(anyString) returns Some(linkerDetailList)
 
       // given
       val macAddress = MAC_ADDRESS
@@ -57,10 +57,12 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
         )
       )
 
-      val customer = Customer(
-        id = CUSTOMER_ID,
-        createdAt = TIMESTAMP,
-        updatedAt = TIMESTAMP
+      val customerList = Seq(
+        Customer(
+          id = CUSTOMER_ID,
+          createdAt = TIMESTAMP,
+          updatedAt = TIMESTAMP
+        )
       )
 
       val thingList = Seq(
@@ -71,7 +73,7 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
         )
       )
       mockLinkerDetailRepo.findLinkerDetailByMacAddress(anyString) returns Some(linkerDetailList)
-      mockPurchaseRepo.findHost(anyLong, anyLong) returns Some(customer)
+      mockPurchaseRepo.findHost(anyLong, anyLong) returns customerList
       mockThingRepo.findByLinkerId(anyLong) returns thingList
 
       // given
@@ -82,11 +84,10 @@ class LinkerServiceSpec extends PlaySpecification with Mockito {
       val result = service.getLinkerDetail(macAddress, customerId)
 
       // then
-      val expectedResult = Right(linkerDetailList.head, Some(customer), thingList)
+      val expectedResult = Right(linkerDetailList.head, customerList, thingList)
 
       result mustEqual(expectedResult)
     }
-
   }
 
 }

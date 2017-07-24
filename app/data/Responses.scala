@@ -1,8 +1,8 @@
 package data
 
 import common.Common
-import models.Customer
-import play.api.libs.json.{JsValue, Json, Writes}
+import models.{Thing, Customer}
+import play.api.libs.json.{JsArray, JsValue, Json, Writes}
 
 /**
   * Created by mijeongpark on 2017. 7. 10..
@@ -16,8 +16,13 @@ case class GetUserDetailResponse(
                                 switcherList: List[String],
                                 requestList: List[String]
                                 )
-case class GetAuthInfoResponse(
-                              accessToken: String)
+case class GetAuthInfoResponse(accessToken: String)
+case class GetLinkerDetailResponse(
+                                  active: Boolean,
+                                  host: Host,
+                                  things: Seq[Thing]
+                                  )
+case class Host(phoneNumber: String, name: String)
 
 object SuccessResponse {
 
@@ -87,6 +92,28 @@ object GetAuthInfoResponse {
     }
   }
 }
+
+object GetLinkerDetailResponse {
+
+  implicit val implicitGetLinkerDetailResponse = new Writes[GetLinkerDetailResponse] {
+    def writes(response: GetLinkerDetailResponse): JsValue = {
+      Json.obj(
+        "active" -> response.active,
+        "host" -> Json.obj(
+          "phoneNumber" -> response.host.phoneNumber,
+          "name" -> response.host.name
+        ),
+        "things" -> JsArray(response.things.map(thing =>
+        Json.obj(
+          "macAddress" -> thing.macAddress,
+          "type" -> thing.`type`,
+          "active" -> thing.active
+        )))
+      )
+    }
+  }
+}
+
 
 
 

@@ -225,5 +225,22 @@ trait Tables {
   }
 
   lazy val LinkerDetailsTable = new TableQuery(tag => new LinkerDetailsTable(tag))
+
+  /* Things Table Definitions */
+  class ThingsTable(_tableTag: Tag) extends profile.api.Table[Thing](_tableTag, "Things") {
+
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def linkerId = column[Option[Long]]("linkerId")
+    def `type` = column[Option[String]]("type")
+    def macAddress = column[Option[String]]("macAddress")
+    def active = column[Option[Boolean]]("active")
+    def createdAt = column[Timestamp]("createdAt")
+    def updatedAt = column[Timestamp]("updatedAt")
+    def deletedAt = column[Option[Timestamp]]("deletedAt")
+
+    def * = (id, linkerId, `type`, macAddress, active, createdAt, updatedAt, deletedAt) <> (Thing.tupled, Thing.unapply)
+  }
+
+  lazy val ThingsTable = new TableQuery(tag => new ThingsTable(tag))
 }
 

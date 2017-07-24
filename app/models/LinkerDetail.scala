@@ -21,7 +21,7 @@ class LinkerDetailRepo @Inject()(protected val dbConfigProvider: DatabaseConfigP
   private[models] val LinkerDetails = TableQuery[LinkerDetailsTable]
   private[models] val Linkers = TableQuery[LinkersTable]
 
-  def findLinkerDetailByMacAddress(macAddress: String): LinkerDetail = {
+  def findLinkerDetailByMacAddress(macAddress: String): Option[Seq[LinkerDetail]] = {
 
     val query = for {
       (_, linkerDetail) <-
@@ -29,7 +29,7 @@ class LinkerDetailRepo @Inject()(protected val dbConfigProvider: DatabaseConfigP
         .join(LinkerDetails).on(_.id === _.linkerId)
     } yield (linkerDetail)
 
-    Await.result(db.run(query.result), Common.COMMON_ASYNC_DURATION)
+    Option(Await.result(db.run(query.result), Common.COMMON_ASYNC_DURATION))
   }
 
 }

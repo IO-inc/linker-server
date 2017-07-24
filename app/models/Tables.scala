@@ -79,7 +79,7 @@ case class LinkerDetail(
                         updatedAt: Timestamp,
                         deletedAt: Option[Timestamp] = None)
 
-case class Things(
+case class Thing(
                  id: Long,
                  linkerId: Option[Long] = None,
                  `type`: Option[String] = None,

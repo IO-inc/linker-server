@@ -2,7 +2,7 @@ package controllers
 
 import java.sql.Timestamp
 
-import models.{Linker, Customer, AccessToken}
+import models.{CustomerDevice, Linker, Customer, AccessToken}
 import common.Common
 import services.{UserService, SwitcherService}
 
@@ -27,7 +27,7 @@ class GetUserDetailSpec extends PlaySpecification with Mockito {
   private val ACCESS_TOKEN = "sdfkhsdkjfhsdkjfh"
 
   private val ACCESS_TOKEN_ID = 1L
-  private val CUSTOMER_DEVICE_ID = Option(2L)
+  private val CUSTOMER_DEVICE_ID = 2L
   private val TIMESTAMP = new Timestamp(System.currentTimeMillis())
   private val CUSTOMER_ID = 3L
   private val LINKER_ID = 4L
@@ -58,11 +58,18 @@ class GetUserDetailSpec extends PlaySpecification with Mockito {
 
       var accessToken = AccessToken(
         ACCESS_TOKEN_ID,
-        CUSTOMER_DEVICE_ID,
+        Some(CUSTOMER_DEVICE_ID),
         Option(ACCESS_TOKEN),
         TIMESTAMP,
         TIMESTAMP,
         None
+      )
+
+      var customerDevice = CustomerDevice(
+        id = CUSTOMER_DEVICE_ID,
+        customerId = Some(CUSTOMER_ID),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
       )
 
       var customer = Customer(
@@ -87,8 +94,7 @@ class GetUserDetailSpec extends PlaySpecification with Mockito {
         None
       )
 
-
-      mockUserService.checkAccessToken(anyString) returns Right(accessToken)
+      mockUserService.checkAccessToken(anyString) returns Right(accessToken, customerDevice)
       mockUserService.getUserDetail(any) returns ((customer, Seq(linker)))
       mockSwitcherService.getSwitcherDetail(anyString) returns ((List(MAC_ADDRESS), List(REQUEST_ID)))
 

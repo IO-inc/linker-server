@@ -190,13 +190,6 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
     "return Left(error) if there is no access token" in new WithApplication() {
 
-      /*val accessTokenInfo = AccessToken(
-        id = ACCESS_TOKEN_ID,
-        accessToken = Some(ACCESS_TOKEN),
-        createdAt = TIMESTAMP,
-        updatedAt = TIMESTAMP
-      )
-      */
       mockAccessTokenRepo.findByAccessToken(anyString) returns None
 
       // given
@@ -215,12 +208,20 @@ class UserServiceSpec extends PlaySpecification with Mockito {
 
       val accessTokenInfo = AccessToken(
         id = ACCESS_TOKEN_ID,
+        customerDeviceId = Some(CUSTOMER_DEVICE_ID),
         accessToken = Some(ACCESS_TOKEN),
         createdAt = TIMESTAMP,
         updatedAt = TIMESTAMP
       )
 
-      mockAccessTokenRepo.findByAccessToken(anyString) returns Some(accessTokenInfo)
+      val customerDevice = CustomerDevice(
+        id = ACCESS_TOKEN_ID,
+        customerId = Some(CUSTOMER_ID),
+        createdAt = TIMESTAMP,
+        updatedAt = TIMESTAMP
+      )
+
+      mockAccessTokenRepo.findByAccessToken(anyString) returns Some(accessTokenInfo, customerDevice)
 
       // given
       val accessToken = ACCESS_TOKEN
@@ -229,7 +230,7 @@ class UserServiceSpec extends PlaySpecification with Mockito {
       val result = service.checkAccessToken(accessToken)
 
       // then
-      val expectedResult = Right(accessTokenInfo)
+      val expectedResult = Right(accessTokenInfo, customerDevice)
 
       result mustEqual(expectedResult)
     }

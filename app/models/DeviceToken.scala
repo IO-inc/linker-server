@@ -1,7 +1,6 @@
 package models
 
 import Tables._
-import data.ErrorMessage
 import java.sql.Timestamp
 import javax.inject.Inject
 
@@ -32,7 +31,7 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   private def __insert(customerDeviceId: Option[Long], token: Option[String], now: Timestamp): DBIO[Long] =
     DeviceTokens returning DeviceTokens.map(_.id) += DeviceToken(0, customerDeviceId, token, now, now, None)
 
-  def createDeviceToken(token: String, accessToken: String): Either[String, Long] = {
+  def createDeviceToken(token: String, accessToken: String): Option[Long] = {
     val now = new Timestamp(System.currentTimeMillis())
 
     val actions = for {
@@ -43,12 +42,11 @@ class DeviceTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
       }
     } yield deviceTokenResult
 
-    // TODO: define error code
     Await.result(
       db.run(actions.transactionally).map { deviceTokenResult =>
         deviceTokenResult match {
-          case n: Long => Right(n)
-          case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
+          case n: Long => Some(n)
+          case None => None
         }
       }, Common.COMMON_ASYNC_DURATION)
   }

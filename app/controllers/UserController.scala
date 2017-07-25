@@ -2,12 +2,11 @@ package controllers
 
 import javax.inject._
 
-import models._
 import data._
 import services.{UserService, SwitcherService}
 import common.{Request}
 
-import play.api.libs.json.{JsValue, Writes, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,8 +39,8 @@ class UserController @Inject()(cc: ControllerComponents,
     val accessToken = authorization.get.split(" ")(1)
 
     userService.checkAccessToken(accessToken) match {
-      case Right(accessToken) => {
-        val (customer, linkerList) = userService.getUserDetail(accessToken)
+      case Right(result) => {
+        val (customer, linkerList) = userService.getUserDetail(result._1)
         // TODO: replace "Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=" to access token parameter after modifying Switcher Server
         val switcherDetail = switcherService.getSwitcherDetail("Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=")
         val userDetail = GetUserDetailResponse(customer, linkerList.map(m => m.macAddress.get), switcherDetail._1, switcherDetail._2)
@@ -68,6 +67,30 @@ class UserController @Inject()(cc: ControllerComponents,
       case Left(parameter) =>
         Future.successful(Ok(Json.toJson(ErrorResponse(message = parameter + ErrorMessage.NO_REQUEST_PARAMETER))))
     }
+  }
+
+  def getAuthInfo = Action.async { implicit request: Request[AnyContent] =>
+
+    val jsonBody: Option[JsValue] = request.body.asJson
+    val phoneNumber = (jsonBody.get \ "phoneNumber").as[String]
+    val uuid = (jsonBody.get \ "uuid").as[String]
+    val authNumber = (jsonBody.get \ "authNumber").as[String]
+    val parameterMap = Map("phoneNumber" -> phoneNumber, "uuid" -> uuid, "authNumber" -> authNumber)
+
+    Request.checkRequestParameters(parameterMap) match {
+      case Right(_) => {
+        userService.checkAuthSMS(phoneNumber, authNumber, uuid) match {
+          case Right(accessToken) => {
+            val authInfo = GetAuthInfoResponse(accessToken)
+            Future.successful(Ok(Json.toJson(SuccessResponse(data = Option(Json.toJson(authInfo))))))
+          }
+          case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
+        }
+      }
+      case Left(parameter) =>
+        Future.successful(Ok(Json.toJson(ErrorResponse(message = parameter + ErrorMessage.NO_REQUEST_PARAMETER))))
+    }
+
   }
 
 }

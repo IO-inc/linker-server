@@ -52,23 +52,43 @@ case class Linker(
 
 case class Purchase(
                      id: Long,
-                     linkerId: Option[Long],
-                     customerId: Option[Long],
-                     price: Option[String],
-                     warrantyDate: Option[Timestamp],
+                     linkerId: Option[Long] = None,
+                     customerId: Option[Long] = None,
+                     price: Option[String] = None,
+                     warrantyDate: Option[Timestamp] = None,
                      createdAt: Timestamp,
                      updatedAt: Timestamp,
-                     deletedAt: Option[Timestamp]
-                   )
+                     deletedAt: Option[Timestamp] = None)
 
 case class PurchaseOwner(
                           id: Long,
-                          purchaseId: Option[Long],
-                          customerId: Option[Long],
+                          purchaseId: Option[Long] = None,
+                          customerId: Option[Long] = None,
                           createdAt: Timestamp,
                           updatedAt: Timestamp,
-                          deletedAt: Option[Timestamp]
-                        )
+                          deletedAt: Option[Timestamp] = None)
+
+case class LinkerDetail(
+                        id: Long,
+                        linkerId: Option[Long] = None,
+                        status: Option[String] = None,
+                        pKey: Option[String] = None,
+                        shareCode: Option[String] = None,
+                        active: Option[Boolean] = None,
+                        createdAt: Timestamp,
+                        updatedAt: Timestamp,
+                        deletedAt: Option[Timestamp] = None)
+
+case class Thing(
+                 id: Long,
+                 linkerId: Option[Long] = None,
+                 `type`: Option[String] = None,
+                 macAddress: Option[String] = None,
+                 active: Option[Boolean] = None,
+                 createdAt: Timestamp,
+                 updatedAt: Timestamp,
+                 deletedAt: Option[Timestamp] = None)
+
 
 object Tables extends {
   val profile = slick.jdbc.MySQLProfile
@@ -187,5 +207,40 @@ trait Tables {
   }
 
   lazy val PurchaseOwnersTable = new TableQuery(tag => new PurchaseOwnersTable(tag))
+
+  /* LinkerDetails Table Definitions */
+  class LinkerDetailsTable(_tableTag: Tag) extends profile.api.Table[LinkerDetail](_tableTag, "LinkerDetails") {
+
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def linkerId = column[Option[Long]]("linkerId")
+    def status = column[Option[String]]("status")
+    def pKey = column[Option[String]]("pKey")
+    def shareCode = column[Option[String]]("shareCode")
+    def active = column[Option[Boolean]]("active")
+    def createdAt = column[Timestamp]("createdAt")
+    def updatedAt = column[Timestamp]("updatedAt")
+    def deletedAt = column[Option[Timestamp]]("deletedAt")
+
+    def * = (id, linkerId, status, pKey, shareCode, active, createdAt, updatedAt, deletedAt) <> (LinkerDetail.tupled, LinkerDetail.unapply)
+  }
+
+  lazy val LinkerDetailsTable = new TableQuery(tag => new LinkerDetailsTable(tag))
+
+  /* Things Table Definitions */
+  class ThingsTable(_tableTag: Tag) extends profile.api.Table[Thing](_tableTag, "Things") {
+
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def linkerId = column[Option[Long]]("linkerId")
+    def `type` = column[Option[String]]("type")
+    def macAddress = column[Option[String]]("macAddress")
+    def active = column[Option[Boolean]]("active")
+    def createdAt = column[Timestamp]("createdAt")
+    def updatedAt = column[Timestamp]("updatedAt")
+    def deletedAt = column[Option[Timestamp]]("deletedAt")
+
+    def * = (id, linkerId, `type`, macAddress, active, createdAt, updatedAt, deletedAt) <> (Thing.tupled, Thing.unapply)
+  }
+
+  lazy val ThingsTable = new TableQuery(tag => new ThingsTable(tag))
 }
 

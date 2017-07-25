@@ -15,8 +15,7 @@ import scala.concurrent.{Await, Future}
   * Created by mijeongpark on 2017. 7. 5..
   */
 
-class CustomerRepo @Inject()(
-                              protected val dbConfigProvider: DatabaseConfigProvider) {
+class CustomerRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
 
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   val db = dbConfig.db

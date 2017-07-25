@@ -39,8 +39,8 @@ class UserController @Inject()(cc: ControllerComponents,
     val accessToken = authorization.get.split(" ")(1)
 
     userService.checkAccessToken(accessToken) match {
-      case Right(accessToken) => {
-        val (customer, linkerList) = userService.getUserDetail(accessToken)
+      case Right(result) => {
+        val (customer, linkerList) = userService.getUserDetail(result._1)
         // TODO: replace "Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=" to access token parameter after modifying Switcher Server
         val switcherDetail = switcherService.getSwitcherDetail("Ra2uLPm0CTRQYXdzMglpbs+N7eLv4svrXEjd9YLACEI=")
         val userDetail = GetUserDetailResponse(customer, linkerList.map(m => m.macAddress.get), switcherDetail._1, switcherDetail._2)

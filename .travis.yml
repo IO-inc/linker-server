@@ -6,7 +6,7 @@ scala:
 branches:
   only:
     - dev
-    - gHSjcqg0
+    - feature/7bbF6WRR
 
 jdk:
   - oraclejdk8

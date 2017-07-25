@@ -24,9 +24,9 @@ class UserService @Inject()(
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def checkAccessToken(accessToken: String): Either[String, AccessToken] = {
+  def checkAccessToken(accessToken: String): Either[String, (AccessToken, CustomerDevice)] = {
     accessTokenRepo.findByAccessToken(accessToken) match {
-      case Some(accessToken) => Right(accessToken)
+      case Some(result) => Right(result._1, result._2)
       case None => Left(ErrorMessage.NO_ACCESS_TOKEN)
     }
   }

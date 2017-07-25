@@ -17,10 +17,10 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   val db = dbConfig.db
 
-  import scala.concurrent.ExecutionContext.Implicits.global
   import dbConfig.profile.api._
 
   private[models] val AccessTokens = TableQuery[AccessTokensTable]
+  private[models] val CustomerDevices = TableQuery[CustomerDevicesTable]
 
   private def __findByAccessToken(accessToken: String): DBIO[Option[AccessToken]] =
     AccessTokens.filter(_.accessToken === accessToken).result.headOption
@@ -31,8 +31,15 @@ class AccessTokenRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   private def __insert(accessToken: AccessToken): DBIO[Long] =
     AccessTokens returning AccessTokens.map(_.id) += accessToken
 
-  def findByAccessToken(accessToken: String): Option[AccessToken] = {
-    Await.result(db.run(__findByAccessToken(accessToken)), Common.COMMON_ASYNC_DURATION)
+  def findByAccessToken(accessToken: String): Option[(AccessToken, CustomerDevice)] = {
+
+    val query = for {
+      (accessToken, customerDevice) <-
+      AccessTokens.filter(_.accessToken === accessToken)
+        .join(CustomerDevices).on(_.customerDeviceId === _.id)
+    } yield (accessToken, customerDevice)
+
+    Await.result(db.run(query.result.headOption), Common.COMMON_ASYNC_DURATION)
   }
 
   def findByCustomerDeviceId(customerDeviceId: Long): Option[AccessToken] = {

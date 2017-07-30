@@ -23,7 +23,13 @@ class ThingRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
   private def __findByLinkerId(linkerId: Long): DBIO[Seq[Thing]] =
     Things.filter(_.linkerId === linkerId).filter(_.deletedAt.isEmpty).result
 
+  private def __findByMacAddress(macAddress: String): DBIO[Option[Thing]] =
+    Things.filter(_.macAddress === macAddress).filter(_.deletedAt.isEmpty).result.headOption
+
   def findByLinkerId(linkerId: Long): Seq[Thing] =
     Await.result(db.run(__findByLinkerId(linkerId)), Common.COMMON_ASYNC_DURATION)
+
+  def findByMacAddress(macAddress: String): Option[Thing] =
+    Await.result(db.run(__findByMacAddress(macAddress)), Common.COMMON_ASYNC_DURATION)
 
 }

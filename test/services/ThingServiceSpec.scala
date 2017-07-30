@@ -101,7 +101,7 @@ class ThingServiceSpec extends PlaySpecification with Mockito {
       val result = service.getThingCommandListByType(`type`, macAddress, command)
 
       // then
-      val expectedResult = Right(commandList)
+      val expectedResult = Right(thing, commandList)
 
       result mustEqual(expectedResult)
     }

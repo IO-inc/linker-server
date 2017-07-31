@@ -33,10 +33,9 @@ class ThingServiceSpec extends PlaySpecification with Mockito {
       // given
       val `type` = `TYPE`
       val macAddress = MAC_ADDRESS
-      var command = COMMAND
 
       // when
-      val result = service.getThingCommandListByType(`type`, macAddress, command)
+      val result = service.getThingCommandListByType(`type`, macAddress)
 
       // then
       val expectedResult = Left(ErrorMessage.NO_THING)
@@ -60,10 +59,9 @@ class ThingServiceSpec extends PlaySpecification with Mockito {
       // given
       val `type` = `TYPE`
       val macAddress = MAC_ADDRESS
-      var command = COMMAND
 
       // when
-      val result = service.getThingCommandListByType(`type`, macAddress, command)
+      val result = service.getThingCommandListByType(`type`, macAddress)
 
       // then
       val expectedResult = Left(ErrorMessage.INVALID_THING_TYPE)
@@ -90,15 +88,14 @@ class ThingServiceSpec extends PlaySpecification with Mockito {
       )
 
       mockThingRepo.findByMacAddress(anyString) returns Some(thing)
-      mockCommandRepo.findByCommand(anyLong, anyString) returns commandList
+      mockCommandRepo.findByThingId(anyLong) returns commandList
 
       // given
       val `type` = `TYPE`
       val macAddress = MAC_ADDRESS
-      var command = COMMAND
 
       // when
-      val result = service.getThingCommandListByType(`type`, macAddress, command)
+      val result = service.getThingCommandListByType(`type`, macAddress)
 
       // then
       val expectedResult = Right(thing, commandList)

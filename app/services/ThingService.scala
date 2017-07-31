@@ -14,14 +14,14 @@ class ThingService @Inject()(
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def getThingCommandListByType(`type`: String, macAddress: String, command: String): Either[String, (Thing, Seq[Command])] = {
+  def getThingCommandListByType(`type`: String, macAddress: String): Either[String, (Thing, Seq[Command])] = {
 
     thingRepo.findByMacAddress(macAddress) match {
       case Some(thing) => {
         if (thing.`type`.get != `type`) return Left(ErrorMessage.INVALID_THING_TYPE)
 
         val thingId = thing.id
-        val commandList = commandRepo.findByCommand(thingId, command)
+        val commandList = commandRepo.findByThingId(thingId)
         Right(thing, commandList)
       }
       case None => Left(ErrorMessage.NO_THING)

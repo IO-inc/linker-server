@@ -2,6 +2,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import common.Common
+import data.SwitcherDetail
 import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 
@@ -29,6 +30,19 @@ class SwitcherService @Inject()(ws: WSClient) {
       val requestList = (((response.json \ "data").as[JsValue]) \ "requestList").as[List[String]]
 
       (switcherList, requestList)
+    }
+
+    Await.result(request, Common.COMMON_ASYNC_DURATION)
+  }
+
+  def getSwitcherDetail(macAddress: String, accessToken: String): SwitcherDetail = {
+
+    val path = "/v3/mobile/products/" + macAddress
+
+    val request = async {
+      // TODO: separate API call
+      val response = await(ws.url(HOST + path).withHttpHeaders(("Authorization","Bearer " + accessToken)).execute("GET"))
+      ((response.json \ "data").as[SwitcherDetail])
     }
 
     Await.result(request, Common.COMMON_ASYNC_DURATION)

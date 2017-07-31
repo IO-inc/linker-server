@@ -89,6 +89,15 @@ case class Thing(
                  updatedAt: Timestamp,
                  deletedAt: Option[Timestamp] = None)
 
+case class Command(
+                  id: Long,
+                  thingId: Option[Long] = None,
+                  command: Option[String] = None,
+                  detail: Option[String] = None,
+                  createdAt: Timestamp,
+                  updatedAt: Timestamp,
+                  deletedAt: Option[Timestamp] = None)
+
 
 object Tables extends {
   val profile = slick.jdbc.MySQLProfile
@@ -242,5 +251,21 @@ trait Tables {
   }
 
   lazy val ThingsTable = new TableQuery(tag => new ThingsTable(tag))
+
+  /* Commands Table Definitions */
+  class CommandsTable(_tableTag: Tag) extends profile.api.Table[Command](_tableTag, "Commands") {
+
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def thingId = column[Option[Long]]("thingId")
+    def command = column[Option[String]]("command")
+    def detail = column[Option[String]]("detail")
+    def createdAt = column[Timestamp]("createdAt")
+    def updatedAt = column[Timestamp]("updatedAt")
+    def deletedAt = column[Option[Timestamp]]("deletedAt")
+
+    def * = (id, thingId, command, detail, createdAt, updatedAt, deletedAt) <> (Command.tupled, Command.unapply)
+  }
+
+  lazy val CommandsTable = new TableQuery(tag => new CommandsTable(tag))
 }
 

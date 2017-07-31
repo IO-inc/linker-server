@@ -2,7 +2,7 @@ package data
 
 import common.Common
 import models.{Thing, Customer}
-import play.api.libs.json.{JsArray, JsValue, Json, Writes}
+import play.api.libs.json._
 
 /**
   * Created by mijeongpark on 2017. 7. 10..
@@ -23,6 +23,10 @@ case class GetLinkerDetailResponse(
                                   things: Seq[Thing]
                                   )
 case class Host(phoneNumber: String, name: String)
+case class SwitcherDetail(
+                         status: String,
+                         switcherId: Long
+                         )
 
 object SuccessResponse {
 
@@ -110,6 +114,18 @@ object GetLinkerDetailResponse {
           "active" -> thing.active
         )))
       )
+    }
+  }
+}
+
+object SwitcherDetail {
+
+  implicit val implicitSwitcherDetail = new Reads[SwitcherDetail] {
+    def reads(response: JsValue): JsResult[SwitcherDetail] = {
+      for {
+        status <- (response \ "stauts").validate[String]
+        switcherId <- (response \ "switcherId").validate[Long]
+      } yield SwitcherDetail(status, switcherId)
     }
   }
 }

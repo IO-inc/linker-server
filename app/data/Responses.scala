@@ -1,7 +1,7 @@
 package data
 
 import common.Common
-import models.{Thing, Customer}
+import models.{Command, Customer, Thing}
 import play.api.libs.json._
 
 /**
@@ -25,8 +25,27 @@ case class GetLinkerDetailResponse(
 case class Host(phoneNumber: String, name: String)
 case class SwitcherDetail(
                          status: String,
-                         switcherId: Long
-                         )
+                         switcherId: Long,
+                         modelCode: String,
+                         macAddress: String,
+                         startAt: String,
+                         endAt: String,
+                         paymentPlanId: Int,
+                         firstPayAt: String,
+                         nextPayAt: String,
+                         shareCode: String,
+                         hashingShareCode: String,
+                         pKey: String,
+                         freeYN: String,
+                         userName: String,
+                         customerId: Long,
+                         duration: String,
+                         `type`: String,
+                         currentTime: String)
+case class GetThingDetailResponse(
+                                 switcherDetail: SwitcherDetail,
+                                 commands: Seq[Command],
+                                 thing: Thing)
 
 object SuccessResponse {
 
@@ -123,15 +142,69 @@ object SwitcherDetail {
   implicit val implicitSwitcherDetail = new Reads[SwitcherDetail] {
     def reads(response: JsValue): JsResult[SwitcherDetail] = {
       for {
-        status <- (response \ "stauts").validate[String]
+        status <- (response \ "status").validate[String]
         switcherId <- (response \ "switcherId").validate[Long]
-      } yield SwitcherDetail(status, switcherId)
+        modelCode <- (response \ "modelCode").validate[String]
+        macAddress <- (response \ "macaddress").validate[String]
+        startAt <- (response \ "startDate").validate[String]
+        endAt <- (response \ "endDate").validate[String]
+        paymentPlanId <- (response \ "payPlanCode").validate[Int]
+        firstPatyAt <- (response \ "firstPayDate").validate[String]
+        nextPayAt <- (response \ "nextPayDate").validate[String]
+        shareCode <- (response \ "shareCode").validate[String]
+        hashingShareCode <- (response \ "hashingShareCode").validate[String]
+        pKey <- (response \ "pKey").validate[String]
+        freeYN <- (response \ "freeYN").validate[String]
+        userName <- (response \ "username").validate[String]
+        customerId <- (response \ "customerId").validate[Long]
+        duration <- (response \ "duration").validate[String]
+        `type` <- (response \ "type").validate[String]
+        currentTime <- (response \ "currentTime").validate[String]
+
+      } yield SwitcherDetail(
+        status, switcherId, modelCode,
+        macAddress, startAt, endAt,
+        paymentPlanId, firstPatyAt, nextPayAt,
+        shareCode, hashingShareCode, pKey,
+        freeYN, userName, customerId,
+        duration, `type`, currentTime)
     }
   }
 }
 
+object GetThingDetailResponse {
 
-
+  implicit val implicitGetThingDetailResponse = new Writes[GetThingDetailResponse] {
+    def writes(response: GetThingDetailResponse): JsValue = {
+      Json.obj(
+        "status" -> response.switcherDetail.status,
+        "switcherId" -> response.switcherDetail.switcherId,
+        "modelCode" -> response.switcherDetail.modelCode,
+        "macAddress" -> response.switcherDetail.macAddress,
+        "startAt" -> response.switcherDetail.startAt,
+        "endAt" -> response.switcherDetail.endAt,
+        "paymentPlanId" -> response.switcherDetail.paymentPlanId,
+        "firstPayAt" -> response.switcherDetail.firstPayAt,
+        "nextPayAt" -> response.switcherDetail.nextPayAt,
+        "shareCode" -> response.switcherDetail.shareCode,
+        "hashingShareCode" -> response.switcherDetail.hashingShareCode,
+        "pKey" -> response.switcherDetail.pKey,
+        "freeYN" -> response.switcherDetail.freeYN,
+        "userName" -> response.switcherDetail.userName,
+        "customerId" -> response.switcherDetail.customerId,
+        "duration" -> response.switcherDetail.duration,
+        "type" -> response.switcherDetail.`type`,
+        "currentTime" -> response.switcherDetail.currentTime,
+        "commands" -> JsArray(response.commands.map(command =>
+        Json.obj(
+          "command" -> command.command,
+          "detail" -> command.detail
+        ))),
+        "active" -> response.thing.active
+      )
+    }
+  }
+}
 
 
 

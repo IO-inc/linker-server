@@ -30,12 +30,16 @@ class ThingController @Inject()(cc: ControllerComponents,
     Request.checkRequestParameters(parameterMap) match {
       case Right(_) => {
 
-        thingService.getThingCommandListByType(`type`, macAddress, "RESERVATION") match {
+        thingService.getThingCommandListByType(`type`, macAddress) match {
           case Right((thing, commandList)) => {
             val switcherDetail = switcherService.getSwitcherDetail(macAddress, accessToken)
-            println("[switcherDetail] " + switcherDetail)
+            val thingDetailResult = GetThingDetailResponse(
+              switcherDetail,
+              commandList,
+              thing
+            )
 
-            Future.successful(Ok(Json.toJson(ErrorResponse(message = ""))))
+            Future.successful(Ok(Json.toJson(SuccessResponse(data = Option(Json.toJson(thingDetailResult))))))
           }
           case Left(message) => Future.successful(Ok(Json.toJson(ErrorResponse(message = message))))
         }

@@ -21,10 +21,10 @@ class CommandRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
   private[models] val Commands = TableQuery[CommandsTable]
 
-  private def __findByCommand(thingId: Long, command: String): DBIO[Seq[Command]] =
-    Commands.filter(_.thingId === thingId).filter(_.command === command).filter(_.deletedAt.isEmpty).result
+  private def __findByThingId(thingId: Long): DBIO[Seq[Command]] =
+    Commands.filter(_.thingId === thingId).filter(_.deletedAt.isEmpty).result
 
-  def findByCommand(thingId: Long, command: String): Seq[Command] = {
-    Await.result(db.run(__findByCommand(thingId, command)), Common.COMMON_ASYNC_DURATION)
+  def findByThingId(thingId: Long): Seq[Command] = {
+    Await.result(db.run(__findByThingId(thingId)), Common.COMMON_ASYNC_DURATION)
   }
 }
